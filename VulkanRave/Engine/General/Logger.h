@@ -44,12 +44,10 @@ namespace rv
 		RV_TF_DATE_TIME,
 	};
 
-	class Logger 
+	class Logger : public EventQueueInterface
 	{
 	public:
 		Logger(const TimeFormat& format = RV_TF_TIME);
-		
-		EventListener CreateListener();
 
 		template<typename L>
 		void Log(const L& event) { static_assert(std::is_base_of_v<LogEvent, L>); OnLog(event); queue.Push(event); }
@@ -59,9 +57,6 @@ namespace rv
 	protected:
 		virtual void OnLog(const LogEvent& event);
 		static std::string Format(const TimeFormat& format, const LogEvent& event);
-
-	private:
-		EventQueue queue;
 	};
 
 	class MessageLogger : public Logger

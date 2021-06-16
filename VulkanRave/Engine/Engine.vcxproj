@@ -181,6 +181,7 @@
     <ClInclude Include="Utilities\Exception.h" />
     <ClInclude Include="Utilities\ID.h" />
     <ClInclude Include="Utilities\Reference.h" />
+    <ClInclude Include="Utilities\String.h" />
     <ClInclude Include="Utilities\Types.h" />
   </ItemGroup>
   <ItemGroup>

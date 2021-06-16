@@ -11,11 +11,6 @@ rv::Logger::Logger(const TimeFormat& format)
 {
 }
 
-rv::EventListener rv::Logger::CreateListener()
-{
-	return queue.CreateListener();
-}
-
 void rv::Logger::OnLog(const LogEvent& event)
 {
 }

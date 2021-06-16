@@ -53,7 +53,7 @@ namespace rv
 	class EventQueue
 	{
 	public:
-		EventListener CreateListener();
+		EventListener Listen();
 		template<typename E>
 		void Push(const E& event)
 		{
@@ -77,6 +77,15 @@ namespace rv
 
 	private:
 		std::list<detail::EventQueue> queues;
+	};
+
+	class EventQueueInterface
+	{
+	public:
+		EventListener Listen();
+
+	protected:
+		EventQueue queue;
 	};
 
 	EventID unique_event_id();

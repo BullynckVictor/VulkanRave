@@ -10,7 +10,7 @@ rv::Event::~Event() noexcept
 {
 }
 
-rv::EventListener rv::EventQueue::CreateListener()
+rv::EventListener rv::EventQueue::Listen()
 {
 	queues.emplace_back();
 	EventListener listener;
@@ -53,4 +53,9 @@ std::shared_ptr<const rv::Event> rv::EventListener::Get()
 rv::EventID rv::unique_event_id()
 {
     return unique_id<Event>();
+}
+
+rv::EventListener rv::EventQueueInterface::Listen()
+{
+    return queue.Listen();
 }
