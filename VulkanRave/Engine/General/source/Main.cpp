@@ -18,6 +18,10 @@ int rv::rave_main()
 		main();
 		return EXIT_SUCCESS;
 	}
+	catch (const Exception& e)
+	{
+		error_box("rv::Exception", e.what());
+	}
 	catch (const std::exception& e)
 	{
 		error_box("std::exception", e.what());

@@ -73,22 +73,22 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(Configuration)_$(PlatformTarget)\$(ProjectName)\</OutDir>
-    <IntDir>$(SolutionDir)bin-int\$(Configuration)_$(PlatformTarget)\$(ProjectName)\</IntDir>
+    <IntDir>$(SolutionDir)bin_int\$(Configuration)_$(PlatformTarget)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(Configuration)_$(PlatformTarget)\$(ProjectName)\</OutDir>
-    <IntDir>$(SolutionDir)bin-int\$(Configuration)_$(PlatformTarget)\$(ProjectName)\</IntDir>
+    <IntDir>$(SolutionDir)bin_int\$(Configuration)_$(PlatformTarget)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(Configuration)_$(PlatformTarget)\$(ProjectName)\</OutDir>
-    <IntDir>$(SolutionDir)bin-int\$(Configuration)_$(PlatformTarget)\$(ProjectName)\</IntDir>
+    <IntDir>$(SolutionDir)bin_int\$(Configuration)_$(PlatformTarget)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(Configuration)_$(PlatformTarget)\$(ProjectName)\</OutDir>
-    <IntDir>$(SolutionDir)bin-int\$(Configuration)_$(PlatformTarget)\$(ProjectName)\</IntDir>
+    <IntDir>$(SolutionDir)bin_int\$(Configuration)_$(PlatformTarget)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -177,6 +177,8 @@
     <ClInclude Include="General\Main.h" />
     <ClInclude Include="General\System.h" />
     <ClInclude Include="General\SystemInclude.h" />
+    <ClInclude Include="Graphics\Window.h" />
+    <ClInclude Include="Graphics\Window\Win32Window.h" />
     <ClInclude Include="Utilities\Event.h" />
     <ClInclude Include="Utilities\Exception.h" />
     <ClInclude Include="Utilities\ID.h" />
@@ -187,8 +189,11 @@
   <ItemGroup>
     <ClCompile Include="General\source\Logger.cpp" />
     <ClCompile Include="General\source\Main.cpp" />
+    <ClCompile Include="Graphics\Window\source\Win32Window.cpp" />
+    <ClCompile Include="Graphics\Window\source\Window.cpp" />
     <ClCompile Include="Utilities\source\Event.cpp" />
     <ClCompile Include="Utilities\source\Exception.cpp" />
+    <ClCompile Include="Utilities\source\hresults.cpp" />
     <ClCompile Include="Utilities\source\Reference.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

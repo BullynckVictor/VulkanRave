@@ -1,7 +1,8 @@
 #pragma once
 
+extern void main();
+
 namespace rv
 {
-	extern void main();
 	int rave_main();
 }

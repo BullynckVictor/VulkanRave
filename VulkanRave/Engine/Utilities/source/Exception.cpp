@@ -73,3 +73,19 @@ void rv::rv_assert_file_func(const char* file, const char* source, int line)
 	if (!FileExists(file))
 		throw ElementNotFoundException("File", file, source, line);
 }
+
+#ifdef RV_PLATFORM_WINDOWS
+#include <comdef.h>
+rv::HrException::HrException(const HRESULT hr, const char* source, int line)
+	:
+	Exception("rv::HrException", source, line, str("HRESULT: 0x", std::hex, hr, " [", HrToString(hr), "]\n", _com_error(hr).ErrorMessage()))
+{
+}
+
+void rv::rv_check_hr_func(HRESULT hr, const char* source, int line)
+{
+	if (FAILED(hr))
+		throw HrException(hr, source, line);
+}
+
+#endif

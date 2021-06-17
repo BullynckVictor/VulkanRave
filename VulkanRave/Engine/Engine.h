@@ -5,3 +5,8 @@
 
 #include "Utilities/Exception.h"
 #include "Utilities/Event.h"
+#include "Utilities/String.h"
+
+#include "Graphics/Window.h"
+
+using namespace std::chrono_literals;
