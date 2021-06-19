@@ -1,6 +1,7 @@
 #pragma once
 #include "General/Event.h"
 #include "General/System.h"
+#include "General/MessageType.h"
 #include <sstream>
 #include <chrono>
 #include <type_traits>
@@ -8,14 +9,6 @@
 
 namespace rv
 {
-	enum MessageType
-	{
-		RV_MT_INFO = 0,
-		RV_MT_DEBUG,
-		RV_MT_WARNING,
-		RV_MT_ERROR
-	};
-
 	struct LogEvent : public Event
 	{
 		LogEvent();

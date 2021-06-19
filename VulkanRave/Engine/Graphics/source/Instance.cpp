@@ -1,9 +1,18 @@
 #include "Graphics/Instance.h"
 #include "Graphics/VulkanPointer.h"
+#include "Graphics/DebugMessenger.h"
 #include "General/System.h"
 #include "General/Logger.h"
 #include "Utilities/Exception.h"
 #include "Utilities/String.h"
+
+template<>
+void rv::destroy<VkInstance>(VkInstance instance)
+{
+	vkDestroyInstance(instance, nullptr);
+}
+
+rv::Instance* rv::static_instance = nullptr;
 
 rv::AppInfo::AppInfo(const char* name, uint32 version)
 	:
@@ -36,8 +45,22 @@ rv::Instance::Instance(const AppInfo& app)
 	createInfo.enabledLayerCount = (u32)app.layers.size();
 	createInfo.ppEnabledLayerNames = app.layers.data();
 
+	bool failed = false;
+	VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
+	if constexpr (build.debug)
+	{
+		debugCreateInfo = DebugMessenger::CreateInfo();
+		createInfo.pNext = &debugCreateInfo;
+		DebugMessenger::static_failed = &failed;
+	}
+
 	rv_check_vkr(vkCreateInstance(&createInfo, nullptr, &instance));
 	debug.Log(str("Created Instance \"", app.info.pApplicationName, "\""));
+	if constexpr (build.debug)
+	{
+		rv_assert(!failed);
+		DebugMessenger::static_failed = nullptr;
+	}
 
 	uint32 nLayers = 0;
 	vkEnumerateInstanceLayerProperties(&nLayers, nullptr);
@@ -55,6 +78,8 @@ rv::Instance::Instance(const AppInfo& app)
 			}
 		rv_assert_info(supported, str("Validation layer \"", layer, "not supported"));
 	}
+
+	static_instance = this;
 }
 
 rv::Instance::Instance(Instance&& rhs) noexcept
@@ -65,11 +90,17 @@ rv::Instance::Instance(Instance&& rhs) noexcept
 
 rv::Instance::~Instance() noexcept
 {
-	release(instance);
+	Release();
 }
 
 rv::Instance& rv::Instance::operator=(Instance&& rhs) noexcept
 {
+	Release();
 	instance = move(rhs.instance);
 	return *this;
+}
+
+void rv::Instance::Release()
+{
+	release(instance);
 }

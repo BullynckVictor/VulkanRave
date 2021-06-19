@@ -183,6 +183,7 @@
     <ClInclude Include="General\EntryPoint.h" />
     <ClInclude Include="General\Logger.h" />
     <ClInclude Include="General\Main.h" />
+    <ClInclude Include="General\MessageType.h" />
     <ClInclude Include="General\System.h" />
     <ClInclude Include="General\SystemInclude.h" />
     <ClInclude Include="General\Window.h" />
@@ -191,6 +192,7 @@
     <ClInclude Include="General\Window\Win32Window.h" />
     <ClInclude Include="General\Event.h" />
     <ClInclude Include="General\Window\WindowEvents.h" />
+    <ClInclude Include="Graphics\DebugMessenger.h" />
     <ClInclude Include="Graphics\Instance.h" />
     <ClInclude Include="Graphics\Vulkan.h" />
     <ClInclude Include="Graphics\VulkanPointer.h" />
@@ -213,6 +215,7 @@
     <ClCompile Include="General\Window\source\Window.cpp" />
     <ClCompile Include="General\source\Event.cpp" />
     <ClCompile Include="General\Window\source\WindowEvents.cpp" />
+    <ClCompile Include="Graphics\source\DebugMessenger.cpp" />
     <ClCompile Include="Graphics\source\Instance.cpp" />
     <ClCompile Include="Utilities\source\Exception.cpp" />
     <ClCompile Include="Utilities\source\hresults.cpp" />

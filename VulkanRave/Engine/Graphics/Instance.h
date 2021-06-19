@@ -24,6 +24,10 @@ namespace rv
 		Instance& operator= (const Instance&) = delete;
 		Instance& operator= (Instance&& rhs) noexcept;
 
+		void Release();
+
 		VkInstance instance = VK_NULL_HANDLE;
 	};
+
+	extern Instance* static_instance;
 }

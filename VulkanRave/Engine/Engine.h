@@ -11,5 +11,6 @@
 #include "Utilities/Vector.h"
 
 #include "Graphics/Instance.h"
+#include "Graphics/DebugMessenger.h"
 
 using namespace std::chrono_literals;

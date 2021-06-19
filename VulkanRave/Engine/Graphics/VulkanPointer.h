@@ -3,9 +3,4 @@
 
 namespace rv
 {
-	template<>
-	void destroy<VkInstance>(VkInstance instance)
-	{
-		vkDestroyInstance(instance, nullptr);
-	}
 }
