@@ -1,6 +1,7 @@
 #pragma once
 #include <list>
 #include <memory>
+#include <mutex>
 #include "Utilities/ID.h"
 #include "Utilities/Reference.h"
 
@@ -14,7 +15,7 @@ namespace rv
 		virtual ~Event() noexcept;
 
 		template<typename E>
-		bool isType() const { return id == E::static_event; }
+		bool equals() const { return id == E::static_event; }
 
 		template<typename E>
 		E& cast() { return *static_cast<E*>(this); }
@@ -46,6 +47,7 @@ namespace rv
 	private:
 		std::list<detail::EventQueue>::iterator queue;
 		ORef<std::list<detail::EventQueue>> parent;
+		ORef<std::mutex> mutex;
 
 		friend class EventQueue;
 	};
@@ -59,6 +61,7 @@ namespace rv
 		{
 			if (!queues.empty())
 			{
+				std::lock_guard<std::mutex> guard(mutex);
 				auto ptr = std::make_shared<E>(event);
 				for (auto& queue : queues)
 					queue.push_back(ptr);
@@ -69,6 +72,7 @@ namespace rv
 		{
 			if (!queues.empty())
 			{
+				std::lock_guard<std::mutex> guard(mutex);
 				auto ptr = std::make_shared<E>(std::move(event));
 				for (auto& queue : queues)
 					queue.push_back(ptr);
@@ -77,6 +81,7 @@ namespace rv
 
 	private:
 		std::list<detail::EventQueue> queues;
+		std::mutex mutex;
 	};
 
 	class EventQueueInterface

@@ -33,7 +33,7 @@
     <ClInclude Include="General\Main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Utilities\Event.h">
+    <ClInclude Include="General\Event.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="General\Logger.h">
@@ -51,10 +51,25 @@
     <ClInclude Include="Utilities\String.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\Window.h">
+    <ClInclude Include="General\Window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\Window\Win32Window.h">
+    <ClInclude Include="General\Window\Win32Window.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\Timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="General\Window\Keyboard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\Flag.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="General\Window\WindowEvents.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\Vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -65,7 +80,7 @@
     <ClCompile Include="General\source\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Utilities\source\Event.cpp">
+    <ClCompile Include="General\source\Event.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Utilities\source\Reference.cpp">
@@ -74,13 +89,22 @@
     <ClCompile Include="General\source\Logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\Window\source\Win32Window.cpp">
+    <ClCompile Include="General\Window\source\Win32Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Utilities\source\hresults.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\Window\source\Window.cpp">
+    <ClCompile Include="General\Window\source\Window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities\source\Timer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="General\Window\source\Keyboard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="General\Window\source\WindowEvents.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

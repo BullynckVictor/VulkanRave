@@ -1,10 +1,11 @@
 #pragma once
 #include "General/SystemInclude.h"
-#include "Utilities/Event.h"
+#include "General/Event.h"
+#include "General/Window/Keyboard.h"
 #include <mutex>
 
 #ifndef RV_PLATFORM_WINDOWS
-#	error Detected platform is not Windows, please include "Engine/Graphics/Window.h" instead
+#	error Detected platform is not Windows, please include "Engine/General/Window.h" instead
 #endif
 
 namespace rv
@@ -25,7 +26,7 @@ namespace rv
 	{
 	public:
 		Window() = default;
-		Window(const char* title, int width, int height);
+		Window(const char* title, int width, int height, bool resize);
 		~Window();
 
 		void HandleMessages();
@@ -37,6 +38,9 @@ namespace rv
 		void SetTitle(const std::string& title);
 
 		bool Minimized() const;
+		void Minimize();
+
+		Keyboard keyboard;
 
 	private:
 		static const WindowClass CreateClass();

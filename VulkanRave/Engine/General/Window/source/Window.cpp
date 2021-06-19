@@ -1,4 +1,4 @@
-#include "Graphics/Window.h"
+#include "General/Window.h"
 #include <condition_variable>
 
 rv::WindowManager::WindowManager()
@@ -13,11 +13,11 @@ rv::WindowManager::~WindowManager()
 	workerThread.join();
 }
 
-rv::Window& rv::WindowManager::Create(const char* title, int width, int height)
+rv::Window& rv::WindowManager::Create(const char* title, int width, int height, bool resize)
 {
 	std::mutex m;
 	std::unique_lock<std::mutex> lock(m);
-	creationVars = { title, width, height };
+	creationVars = { title, width, height, resize };
 	creating = true;
 	cond.wait(lock);
 	auto& ref = *current;
@@ -42,7 +42,7 @@ void rv::WindowManager::Task()
 			}
 			if (creating)
 			{
-				current = &windows.emplace_back(creationVars.title, creationVars.width, creationVars.height);
+				current = &windows.emplace_back(creationVars.title, creationVars.width, creationVars.height, creationVars.resize);
 				creating = false;
 				cond.notify_one();
 			}

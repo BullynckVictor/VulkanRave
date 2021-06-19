@@ -177,24 +177,32 @@
     <ClInclude Include="General\Main.h" />
     <ClInclude Include="General\System.h" />
     <ClInclude Include="General\SystemInclude.h" />
-    <ClInclude Include="Graphics\Window.h" />
-    <ClInclude Include="Graphics\Window\Win32Window.h" />
-    <ClInclude Include="Utilities\Event.h" />
+    <ClInclude Include="General\Window.h" />
+    <ClInclude Include="General\Window\Keyboard.h" />
+    <ClInclude Include="General\Window\Win32Window.h" />
+    <ClInclude Include="General\Event.h" />
+    <ClInclude Include="General\Window\WindowEvents.h" />
     <ClInclude Include="Utilities\Exception.h" />
+    <ClInclude Include="Utilities\Flag.h" />
     <ClInclude Include="Utilities\ID.h" />
     <ClInclude Include="Utilities\Reference.h" />
     <ClInclude Include="Utilities\String.h" />
+    <ClInclude Include="Utilities\Timer.h" />
     <ClInclude Include="Utilities\Types.h" />
+    <ClInclude Include="Utilities\Vector.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="General\source\Logger.cpp" />
     <ClCompile Include="General\source\Main.cpp" />
-    <ClCompile Include="Graphics\Window\source\Win32Window.cpp" />
-    <ClCompile Include="Graphics\Window\source\Window.cpp" />
-    <ClCompile Include="Utilities\source\Event.cpp" />
+    <ClCompile Include="General\Window\source\Keyboard.cpp" />
+    <ClCompile Include="General\Window\source\Win32Window.cpp" />
+    <ClCompile Include="General\Window\source\Window.cpp" />
+    <ClCompile Include="General\source\Event.cpp" />
+    <ClCompile Include="General\Window\source\WindowEvents.cpp" />
     <ClCompile Include="Utilities\source\Exception.cpp" />
     <ClCompile Include="Utilities\source\hresults.cpp" />
     <ClCompile Include="Utilities\source\Reference.cpp" />
+    <ClCompile Include="Utilities\source\Timer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

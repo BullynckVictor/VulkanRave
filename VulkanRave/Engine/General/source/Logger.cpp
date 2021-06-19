@@ -139,7 +139,7 @@ rv::DebugLogger::DebugLogger(const std::string& dumpFile)
 void rv::DebugLogger::OnLog(const LogEvent& message)
 {
 	if constexpr (sys.windows)
-		if (message.isType<LogMessageEvent>())
+		if (message.equals<LogMessageEvent>())
 			OutputDebugString((Format(format, message.cast<LogMessageEvent>()) + '\n').c_str());
 }
 

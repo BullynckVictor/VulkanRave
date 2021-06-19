@@ -1,9 +1,10 @@
 #pragma once
 #include "General/System.h"
+#include "General/Window/WindowEvents.h"
 #include <chrono>
 
 #ifdef RV_PLATFORM_WINDOWS
-#	include "Graphics/Window/Win32Window.h"
+#	include "General/Window/Win32Window.h"
 #endif
 
 namespace rv
@@ -15,7 +16,7 @@ namespace rv
 	public:
 		WindowManager();
 		~WindowManager();
-		Window& Create(const char* title, int width, int height);
+		Window& Create(const char* title, int width, int height, bool resize = false);
 
 		std::chrono::duration<long long, std::milli> sleep_dur = 16ms;
 
@@ -37,6 +38,7 @@ namespace rv
 			const char* title = nullptr;
 			int width = 0;
 			int height = 0;
+			bool resize = false;
 		} creationVars;
 	};
 }

@@ -2,8 +2,9 @@
 
 #ifdef RV_PLATFORM_WINDOWS
 
-#include "Graphics/Window/Win32Window.h"
+#include "General/Window/Win32Window.h"
 #include "General/Logger.h"
+#include "General/Window/WindowEvents.h"
 #include "Utilities/Exception.h"
 #include "Utilities/String.h"
 
@@ -26,19 +27,28 @@ LPTSTR rv::WindowClass::GetIdentifier() const
 	return reinterpret_cast<LPTSTR>(atom);
 }
 
-rv::Window::Window(const char* title, int width, int height)
+rv::Window::Window(const char* title, int width, int height, bool resize)
 	:
 	title(title)
 {
+	DWORD style = (resize ? WS_OVERLAPPEDWINDOW : WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU);
+
+	RECT wr;
+	wr.left = 100;
+	wr.right = width + wr.left;
+	wr.top = 100;
+	wr.bottom = height + wr.top;
+	rv_assert(AdjustWindowRect(&wr, style, FALSE));
+
 	hwnd = rv_not_null_win32(CreateWindowEx(
 		0,                              // Optional window styles.
 		wndClass.GetIdentifier(),       // Window class
 		title,                          // Window text
-		WS_OVERLAPPEDWINDOW,            // Window style
+		style,                          // Window style
 
 		// Size and position
 		CW_USEDEFAULT, CW_USEDEFAULT, 
-		width, height,
+		wr.right - wr.left, wr.bottom - wr.top,
 
 		NULL,                            // Parent window    
 		NULL,                            // Menu
@@ -81,14 +91,20 @@ const std::string& rv::Window::GetTitle() const
 
 void rv::Window::SetTitle(const std::string& newtitle)
 {
-	std::lock_guard<std::mutex> guard(mutex);
 	title = newtitle;
-	rv_assert(SetWindowText(hwnd, title.c_str()));
+	std::lock_guard<std::mutex> guard(mutex);
+	rv_not_null_win32(SetWindowText(hwnd, title.c_str()));
 }
 
 bool rv::Window::Minimized() const
 {
 	return minimized;
+}
+
+void rv::Window::Minimize()
+{
+	std::lock_guard<std::mutex> guard(mutex);
+	ShowWindow(hwnd, SW_HIDE);
 }
 
 const rv::WindowClass rv::Window::CreateClass()
@@ -129,7 +145,6 @@ const char* WMToString(UINT wm);
 
 LRESULT rv::Window::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	debug.Log(WMToString(msg));
 	switch (msg)
 	{
 		case WM_SIZE:
@@ -138,9 +153,31 @@ LRESULT rv::Window::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 				minimized = true;
 			else if (wParam == SIZE_RESTORED || wParam == SIZE_MAXIMIZED)
 				minimized = false;
-			debug.Log(str());
+			queue.Push<WindowResizeEvent>(Size(LOWORD(lParam), HIWORD(lParam)));
 		}
 		return 0;
+
+		//keyboard
+		case WM_KEYDOWN:
+		{
+			keyboard.flagged[u8(wParam)] = true;
+			keyboard.pressed[u8(wParam)] = true;
+			queue.Push<KeyPressedEvent>(u8(wParam));
+		}
+		return 0;
+		case WM_KEYUP:
+		{
+			keyboard.flagged[u8(wParam)] = false;
+			queue.Push<KeyReleasedEvent>(u8(wParam));
+		}
+		return 0;
+		case WM_CHAR:
+		{
+			keyboard.inputChars.Expose().push_back(char(wParam));
+			queue.Push<InputCharEvent>(char(wParam));
+		}
+		return 0;
+
 		case WM_CLOSE:
 		{
 			Close();
