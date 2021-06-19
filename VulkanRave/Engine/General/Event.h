@@ -22,6 +22,11 @@ namespace rv
 		template<typename E>
 		const E& cast() const { return *static_cast<const E*>(this); }
 
+		template<typename E>
+		E* opt_cast() { return equals<E>() ? static_cast<E*>(this) : nullptr; }
+		template<typename E>
+		const E* opt_cast() const { return equals<E>() ? static_cast<const E*>(this) : nullptr; }
+
 		ID<Event> id;
 	};
 

@@ -2,6 +2,7 @@
 #include "General/SystemInclude.h"
 #include "General/Event.h"
 #include "General/Window/Keyboard.h"
+#include "General/Window/Mouse.h"
 #include <mutex>
 
 #ifndef RV_PLATFORM_WINDOWS
@@ -41,6 +42,7 @@ namespace rv
 		void Minimize();
 
 		Keyboard keyboard;
+		Mouse mouse;
 
 	private:
 		static const WindowClass CreateClass();

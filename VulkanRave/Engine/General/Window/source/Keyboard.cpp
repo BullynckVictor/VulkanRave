@@ -15,13 +15,9 @@ bool rv::Keyboard::Flagged(Key key)
 	return flagged[key].Get();
 }
 
-const std::string& rv::Keyboard::PeekInput() const
-{
-	return inputChars.Peek();
-}
-
 std::string rv::Keyboard::Input()
 {
+	std::lock_guard<std::mutex> guard(mutex);
 	return inputChars.Get();
 }
 

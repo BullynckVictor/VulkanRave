@@ -14,24 +14,21 @@ namespace rv
 		Size size;
 	};
 
-	struct KeyPressedEvent : public Event
+	enum Press
 	{
-		static const EventID static_event;
-
-		KeyPressedEvent() : Event(static_event) {}
-		KeyPressedEvent(uchar key) : Event(static_event), key(key) {}
-
-		uchar key = 0;
+		RV_PRESSED,
+		RV_RELEASED
 	};
 
-	struct KeyReleasedEvent : public Event
+	struct KeyEvent : public Event
 	{
 		static const EventID static_event;
 
-		KeyReleasedEvent() : Event(static_event) {}
-		KeyReleasedEvent(uchar key) : Event(static_event), key(key) {}
+		KeyEvent() : Event(static_event) {}
+		KeyEvent(uchar key, Press press) : Event(static_event), key(key), press(press) {}
 
 		uchar key = 0;
+		Press press = RV_RELEASED;
 	};
 
 	struct InputCharEvent : public Event
@@ -42,5 +39,36 @@ namespace rv
 		InputCharEvent(char key) : Event(static_event), key(key) {}
 
 		char key = 0;
+	};
+
+	struct MouseMoveEvent : public Event
+	{
+		static const EventID static_event;
+
+		MouseMoveEvent() : Event(static_event) {}
+		MouseMoveEvent(Point position) : Event(static_event), position(position) {}
+
+		Point position;
+	};
+
+	enum MouseButton
+	{
+		RV_MB_LEFT,
+		RV_MB_MIDDLE,
+		RV_MB_RIGHT,
+		RV_MB_X1,
+		RV_MB_X2
+	};
+
+	struct MouseButtonEvent : public Event
+	{
+		static const EventID static_event;
+
+		MouseButtonEvent() : Event(static_event) {}
+		MouseButtonEvent(Point position, Press press, MouseButton button) : Event(static_event), position(position), press(press), button(button) {}
+
+		Press press = RV_RELEASED;
+		MouseButton button = RV_MB_LEFT;
+		Point position;
 	};
 }

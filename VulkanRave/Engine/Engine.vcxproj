@@ -179,6 +179,7 @@
     <ClInclude Include="General\SystemInclude.h" />
     <ClInclude Include="General\Window.h" />
     <ClInclude Include="General\Window\Keyboard.h" />
+    <ClInclude Include="General\Window\Mouse.h" />
     <ClInclude Include="General\Window\Win32Window.h" />
     <ClInclude Include="General\Event.h" />
     <ClInclude Include="General\Window\WindowEvents.h" />
@@ -195,6 +196,7 @@
     <ClCompile Include="General\source\Logger.cpp" />
     <ClCompile Include="General\source\Main.cpp" />
     <ClCompile Include="General\Window\source\Keyboard.cpp" />
+    <ClCompile Include="General\Window\source\Mouse.cpp" />
     <ClCompile Include="General\Window\source\Win32Window.cpp" />
     <ClCompile Include="General\Window\source\Window.cpp" />
     <ClCompile Include="General\source\Event.cpp" />

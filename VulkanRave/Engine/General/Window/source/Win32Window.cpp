@@ -7,6 +7,7 @@
 #include "General/Window/WindowEvents.h"
 #include "Utilities/Exception.h"
 #include "Utilities/String.h"
+#include <hidusage.h>
 
 const rv::WindowClass rv::Window::wndClass = rv::Window::CreateClass();
 
@@ -57,6 +58,14 @@ rv::Window::Window(const char* title, int width, int height, bool resize)
 	));
 
 	ShowWindow(hwnd, SW_NORMAL);
+
+	//raw input
+	RAWINPUTDEVICE mouseInput;
+	mouseInput.usUsagePage = HID_USAGE_PAGE_GENERIC;
+	mouseInput.usUsage = HID_USAGE_GENERIC_MOUSE;
+	mouseInput.dwFlags = 0;
+	mouseInput.hwndTarget = nullptr;
+	rv_not_null_win32(RegisterRawInputDevices(&mouseInput, 1, sizeof(RAWINPUTDEVICE)));
 }
 
 rv::Window::~Window()
@@ -162,19 +171,138 @@ LRESULT rv::Window::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 		{
 			keyboard.flagged[u8(wParam)] = true;
 			keyboard.pressed[u8(wParam)] = true;
-			queue.Push<KeyPressedEvent>(u8(wParam));
+			queue.Push<KeyEvent>({ u8(wParam), RV_PRESSED });
 		}
 		return 0;
 		case WM_KEYUP:
 		{
 			keyboard.flagged[u8(wParam)] = false;
-			queue.Push<KeyReleasedEvent>(u8(wParam));
+			queue.Push<KeyEvent>({ u8(wParam), RV_RELEASED });
 		}
 		return 0;
 		case WM_CHAR:
 		{
+			std::lock_guard<std::mutex> guard(keyboard.mutex);
 			keyboard.inputChars.Expose().push_back(char(wParam));
 			queue.Push<InputCharEvent>(char(wParam));
+		}
+		return 0;
+
+		//mouse
+		case WM_MOUSEMOVE:
+		{
+			POINTS p = MAKEPOINTS(lParam);
+			mouse.pos = { p.x, p.y };
+			queue.Push<MouseMoveEvent>( mouse.pos );
+		}
+		return 0;
+		case WM_LBUTTONDOWN:
+		{
+			POINTS p = MAKEPOINTS(lParam);
+
+			mouse.left.flag = true;
+			mouse.left.pressed = true;
+
+			queue.Push<MouseButtonEvent>(MouseButtonEvent({ p.x, p.y }, RV_PRESSED, RV_MB_LEFT));
+		}
+		return 0;
+		case WM_MBUTTONDOWN:
+		{
+			POINTS p = MAKEPOINTS(lParam);
+
+			mouse.middle.flag = true;
+			mouse.middle.pressed = true;
+
+			queue.Push<MouseButtonEvent>(MouseButtonEvent({ p.x, p.y }, RV_PRESSED, RV_MB_MIDDLE));
+		}
+		return 0;
+		case WM_RBUTTONDOWN:
+		{
+			POINTS p = MAKEPOINTS(lParam);
+
+			mouse.right.flag = true;
+			mouse.right.pressed = true;
+
+			queue.Push<MouseButtonEvent>(MouseButtonEvent({ p.x, p.y }, RV_PRESSED, RV_MB_RIGHT));
+		}
+		return 0;
+		case WM_XBUTTONDOWN:
+		{
+			POINTS p = MAKEPOINTS(lParam);
+
+			if (HIWORD(wParam) == XBUTTON1)
+			{
+				mouse.x1.flag = true;
+				mouse.x1.pressed = true;
+				queue.Push<MouseButtonEvent>(MouseButtonEvent({ p.x, p.y }, RV_PRESSED, RV_MB_X1));
+			}
+			else
+			{
+				mouse.x2.flag = true;
+				mouse.x2.pressed = true;
+				queue.Push<MouseButtonEvent>(MouseButtonEvent({ p.x, p.y }, RV_PRESSED, RV_MB_X2));
+			}
+		}
+		return 0;
+		case WM_LBUTTONUP:
+		{
+			POINTS p = MAKEPOINTS(lParam);
+			mouse.left.pressed = false;
+			queue.Push<MouseButtonEvent>(MouseButtonEvent({ p.x, p.y }, RV_RELEASED, RV_MB_LEFT));
+		}
+		return 0;
+		case WM_MBUTTONUP:
+		{
+			POINTS p = MAKEPOINTS(lParam);
+			mouse.middle.pressed = false;
+			queue.Push<MouseButtonEvent>(MouseButtonEvent({ p.x, p.y }, RV_RELEASED, RV_MB_MIDDLE));
+		}
+		return 0;
+		case WM_RBUTTONUP:
+		{
+			POINTS p = MAKEPOINTS(lParam);
+			mouse.right.pressed = false;
+			queue.Push<MouseButtonEvent>(MouseButtonEvent({ p.x, p.y }, RV_RELEASED, RV_MB_RIGHT));
+		}
+		return 0;
+		case WM_XBUTTONUP:
+		{
+			POINTS p = MAKEPOINTS(lParam);
+
+			if (HIWORD(wParam) == XBUTTON1)
+			{
+				mouse.x1.pressed = false;
+				queue.Push<MouseButtonEvent>(MouseButtonEvent({ p.x, p.y }, RV_RELEASED, RV_MB_X1));
+			}
+			else
+			{
+				mouse.x2.pressed = false;
+				queue.Push<MouseButtonEvent>(MouseButtonEvent({ p.x, p.y }, RV_RELEASED, RV_MB_X2));
+			}
+		}
+		return 0;
+		case WM_INPUT:
+		{
+			if (GET_RAWINPUT_CODE_WPARAM(wParam) == RIM_INPUT)
+				return DefWindowProc(hwnd, msg, wParam, lParam);
+			if (GET_RAWINPUT_CODE_WPARAM(wParam) != RIM_INPUTSINK)
+			{
+				UINT size = 0;
+				rv_assert(GetRawInputData((HRAWINPUT)lParam, RID_INPUT, nullptr, &size, sizeof(RAWINPUT)) != (UINT)-1);
+				std::vector<unsigned char> buffer(size);
+				rv_assert(GetRawInputData((HRAWINPUT)lParam, RID_INPUT, buffer.data(), &size, sizeof(RAWINPUT)) != (UINT)-1);
+				RAWINPUT& input = *reinterpret_cast<RAWINPUT*>(buffer.data());
+
+				if (input.header.dwType == RIM_TYPEMOUSE)
+				{
+					mouse.delta.Expose() += { input.data.mouse.lLastX, input.data.mouse.lLastY };
+					if (input.data.mouse.usButtonFlags == RI_MOUSE_WHEEL)
+					{
+						SHORT delta = (SHORT)input.data.mouse.usButtonData;
+						mouse.scroll += (int)delta;
+					}
+				}
+			}
 		}
 		return 0;
 

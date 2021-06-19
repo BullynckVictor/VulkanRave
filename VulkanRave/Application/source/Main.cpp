@@ -12,15 +12,19 @@ void main()
 	rv::debug.Log(rv::str(rv::LogMessageEvent::static_event));
 	rv::debug.Log(rv::str(rv::WindowResizeEvent::static_event));
 
+	rv::uint frames = 0;
+
 	while (window.Open())
 	{
 		while (auto e = listener.Get())
 		{
-			if (e->equals<rv::KeyPressedEvent>())
-				window.SetTitle(rv::str("Key ", int(e->cast<rv::KeyPressedEvent>().key), " pressed"));
-			else if (e->equals<rv::KeyReleasedEvent>())
-				window.SetTitle(rv::str("Key ", int(e->cast<rv::KeyReleasedEvent>().key), " released"));
+			if (auto event = e->opt_cast<rv::KeyEvent>())
+				window.SetTitle(rv::str("Key ", int(event->key), " ", event->press == rv::RV_PRESSED ? "pressed" : "released"));
+			else if (auto event = e->opt_cast<rv::MouseButtonEvent>())
+				if (event->button == rv::RV_MB_LEFT)
+					window.SetTitle(rv::str("Left mouse button ", event->press == rv::RV_PRESSED ? "pressed" : "released"));
 		}
-		rv::debug.Log(rv::str(int( 1.0f / timer.Mark() )));
+		frames++;
 	}
+	rv::debug.Log(rv::str((float)frames / timer.Peek(), " fps"));
 }

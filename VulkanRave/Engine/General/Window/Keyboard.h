@@ -4,6 +4,7 @@
 #include <bitset>
 #include <array>
 #include <string>
+#include <mutex>
 
 namespace rv
 {
@@ -16,7 +17,6 @@ namespace rv
 		bool Released(Key key) const;
 		bool Flagged(Key key);
 
-		const std::string& PeekInput() const;
 		std::string Input();
 
 		void Clear();
@@ -25,6 +25,8 @@ namespace rv
 		std::bitset<256> pressed;
 		std::array<Flag<bool>, 256> flagged;
 		Flag<std::string> inputChars;
+
+		std::mutex mutex;
 
 		friend class Window;
 	};
