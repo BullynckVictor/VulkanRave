@@ -146,7 +146,7 @@ LRESULT rv::Window::StaticWindowProcSetup(HWND hwnd, UINT msg, WPARAM wParam, LP
 
 LRESULT rv::Window::StaticWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	Window* window = rv_not_null_win32(reinterpret_cast<Window*>(GetWindowLongPtr(hwnd, GWL_USERDATA)));
+	Window* window = rv_not_null_win32(reinterpret_cast<Window*>(GetWindowLongPtr(hwnd, GWLP_USERDATA)));
 	return window->WindowProc(hwnd, msg, wParam, lParam);
 }
 

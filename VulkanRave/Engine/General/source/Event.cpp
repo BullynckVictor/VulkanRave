@@ -1,4 +1,5 @@
 #include "General/Event.h"
+#include "Utilities/Exception.h"
 
 rv::Event::Event(const ID<Event>& id)
 	:
@@ -10,31 +11,44 @@ rv::Event::~Event() noexcept
 {
 }
 
+rv::EventQueue::EventQueue()
+	:
+	alive(std::make_shared<bool>(true))
+{
+}
+
+rv::EventQueue::~EventQueue()
+{
+	std::lock_guard<std::mutex> guard(mutex);
+	queues.clear();
+	*alive = false;
+}
+
 rv::EventListener rv::EventQueue::Listen()
 {
 	std::lock_guard<std::mutex> guard(mutex);
 	queues.emplace_back();
 	EventListener listener;
-	listener.parent = queues;
+	listener.parent = *this;
 	listener.queue = --queues.end();
-	listener.mutex = mutex;
+	listener.parent_alive = alive;
 	return listener;
 }
 
 rv::EventListener::EventListener(EventListener&& rhs) noexcept
 	:
 	queue(rhs.queue),
-	parent(std::move(rhs.parent)),
-	mutex(std::move(rhs.mutex))
+	parent(std::move(rhs.parent))
 {
 }
 
 rv::EventListener& rv::EventListener::operator=(EventListener&& rhs) noexcept
 {
-	if (parent.valid())
+	rv_assert(parent == rhs.parent);
+	if (parent.valid() && parent_alive.get())
 	{
-		std::lock_guard<std::mutex> guard(rhs.mutex);
-		parent.get().erase(queue);
+		std::lock_guard<std::mutex> guard(parent.get().mutex);
+		parent.get().queues.erase(queue);
 	}
 	queue = rhs.queue;
 	parent = std::move(rhs.parent);
@@ -43,10 +57,10 @@ rv::EventListener& rv::EventListener::operator=(EventListener&& rhs) noexcept
 
 rv::EventListener::~EventListener() noexcept
 {
-	if (parent.valid())
+	if (parent.valid() && parent_alive.get())
 	{
-		std::lock_guard<std::mutex> guard(mutex);
-		parent.get().erase(queue);
+		std::lock_guard<std::mutex> guard(parent.get().mutex);
+		parent.get().queues.erase(queue);
 	}
 }
 
@@ -54,7 +68,7 @@ std::shared_ptr<const rv::Event> rv::EventListener::Get()
 {
 	if (queue->empty())
 		return nullptr;
-	std::lock_guard<std::mutex> guard(mutex);
+	std::lock_guard<std::mutex> guard(parent.get().mutex);
 	auto ret = queue->front();
 	queue->pop_front();
 	return ret;
@@ -62,10 +76,10 @@ std::shared_ptr<const rv::Event> rv::EventListener::Get()
 
 rv::EventID rv::unique_event_id()
 {
-    return unique_id<Event>();
+	return unique_id<Event>();
 }
 
 rv::EventListener rv::EventQueueInterface::Listen()
 {
-    return queue.Listen();
+	return queue.Listen();
 }

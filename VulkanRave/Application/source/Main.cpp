@@ -4,16 +4,12 @@ void main()
 {
 	rv::WindowManager manager;
 	rv::Window& window = manager.Create("Hello World!", 600, 400, true);
-
 	rv::Timer timer;
-
 	rv::EventListener listener = window.Listen();
 
-	rv::debug.Log(rv::str(rv::LogMessageEvent::static_event));
-	rv::debug.Log(rv::str(rv::WindowResizeEvent::static_event));
+	rv::Instance instance;
 
 	rv::uint frames = 0;
-
 	while (window.Open())
 	{
 		while (auto e = listener.Get())

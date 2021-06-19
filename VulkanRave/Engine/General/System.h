@@ -40,12 +40,15 @@ namespace rv
 		bool apple		= false;
 		bool linux		= false;
 		bool android	= false;
+	};
 
-		bool x86		= false;
-		bool x64		= false;
+	struct BuildInfo
+	{
+		bool x86 = false;
+		bool x64 = false;
 
-		bool debug		= false;
-		bool release	= false;
+		bool debug = false;
+		bool release = false;
 	};
 
 	static constexpr SystemInfo sys = {
@@ -65,10 +68,14 @@ namespace rv
 			false,
 		#endif
 		#ifdef RV_PLATFORM_ANDROID
-			true,
+			true
 		#else
-			false,
+			false
 		#endif
+	};
+
+	static constexpr BuildInfo build
+	{
 		#ifdef RV_TARGET_x86
 			true,
 		#else
@@ -89,6 +96,5 @@ namespace rv
 		#else
 			false
 		#endif
-
 	};
 }

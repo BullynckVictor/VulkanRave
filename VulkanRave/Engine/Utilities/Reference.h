@@ -17,6 +17,9 @@ namespace rv
 		OptionalReference(OptionalReference&& rhs) noexcept : ref(rhs.ref) { rhs.ref = nullptr; }
 		OptionalReference& operator= (OptionalReference&& rhs) noexcept { ref = rhs.ref; rhs.ref = nullptr; return *this; }
 
+		bool operator== (const OptionalReference& rhs) { return ref == rhs.ref; }
+		bool operator!= (const OptionalReference& rhs) { return ref != rhs.ref; }
+
 		void invalidate() { ref = nullptr; }
 
 		bool valid() const { return ref; }

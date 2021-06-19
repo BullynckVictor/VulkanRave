@@ -97,7 +97,7 @@
       <PreprocessorDefinitions>_RV_TARGET_$(PlatformArchitecture);WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(VULKAN_SDK)\Include\</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>26812</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -106,6 +106,8 @@
     </Link>
     <Lib>
       <SubSystem>Windows</SubSystem>
+      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -117,7 +119,7 @@
       <PreprocessorDefinitions>_RV_TARGET_$(PlatformArchitecture);WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(VULKAN_SDK)\Include\</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>26812</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -128,6 +130,8 @@
     </Link>
     <Lib>
       <SubSystem>Windows</SubSystem>
+      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -137,7 +141,7 @@
       <PreprocessorDefinitions>_RV_TARGET_$(PlatformArchitecture);_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(VULKAN_SDK)\Include\</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>26812</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -146,6 +150,8 @@
     </Link>
     <Lib>
       <SubSystem>Windows</SubSystem>
+      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -157,7 +163,7 @@
       <PreprocessorDefinitions>_RV_TARGET_$(PlatformArchitecture);NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(VULKAN_SDK)\Include\</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>26812</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -168,6 +174,8 @@
     </Link>
     <Lib>
       <SubSystem>Windows</SubSystem>
+      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -183,6 +191,9 @@
     <ClInclude Include="General\Window\Win32Window.h" />
     <ClInclude Include="General\Event.h" />
     <ClInclude Include="General\Window\WindowEvents.h" />
+    <ClInclude Include="Graphics\Instance.h" />
+    <ClInclude Include="Graphics\Vulkan.h" />
+    <ClInclude Include="Graphics\VulkanPointer.h" />
     <ClInclude Include="Utilities\Exception.h" />
     <ClInclude Include="Utilities\Flag.h" />
     <ClInclude Include="Utilities\ID.h" />
@@ -191,6 +202,7 @@
     <ClInclude Include="Utilities\Timer.h" />
     <ClInclude Include="Utilities\Types.h" />
     <ClInclude Include="Utilities\Vector.h" />
+    <ClInclude Include="Utilities\VulkanPointer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="General\source\Logger.cpp" />
@@ -201,6 +213,7 @@
     <ClCompile Include="General\Window\source\Window.cpp" />
     <ClCompile Include="General\source\Event.cpp" />
     <ClCompile Include="General\Window\source\WindowEvents.cpp" />
+    <ClCompile Include="Graphics\source\Instance.cpp" />
     <ClCompile Include="Utilities\source\Exception.cpp" />
     <ClCompile Include="Utilities\source\hresults.cpp" />
     <ClCompile Include="Utilities\source\Reference.cpp" />

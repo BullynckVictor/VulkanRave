@@ -49,16 +49,16 @@ rv::ElementNotFoundException::ElementNotFoundException(const char* type, const c
 {
 }
 
-void rv::rv_assert_func(bool condition, const char* str_condition, const char* source, int line)
+void rv::__rv_assert_func(bool condition, const char* str_condition, const char* source, int line)
 {
-	if constexpr (sys.debug)
+	if constexpr (build.debug)
 		if (!condition)
 			throw FailedAssertion(str_condition, source, line);
 }
 
-void rv::rv_assert_func(bool condition, const char* str_condition, const std::string& message, const char* source, int line)
+void rv::__rv_assert_func(bool condition, const char* str_condition, const std::string& message, const char* source, int line)
 {
-	if constexpr (sys.debug)
+	if constexpr (build.debug)
 		if (!condition)
 			throw FailedAssertion(str_condition, message, source, line);
 }
@@ -68,7 +68,7 @@ bool rv::FileExists(const char* filename)
 	return std::filesystem::exists(filename);
 }
 
-void rv::rv_assert_file_func(const char* file, const char* source, int line)
+void rv::__rv_assert_file_func(const char* file, const char* source, int line)
 {
 	if (!FileExists(file))
 		throw ElementNotFoundException("File", file, source, line);
@@ -82,10 +82,22 @@ rv::HrException::HrException(const HRESULT hr, const char* source, int line)
 {
 }
 
-void rv::rv_check_hr_func(HRESULT hr, const char* source, int line)
+void rv::__rv_check_hr_func(HRESULT hr, const char* source, int line)
 {
 	if (FAILED(hr))
 		throw HrException(hr, source, line);
 }
 
 #endif
+
+rv::VkException::VkException(const VkResult result, const char* source, int line)
+	:
+	Exception("rv::VkException", source, line, str("VkResult: ", VkResultToString(result), "\n", VkResultDescription(result)))
+{
+}
+
+void rv::__rv_check_vkr_func(const VkResult result, const char* source, int line)
+{
+	if (result != VK_SUCCESS)
+		throw VkException(result, source, line);
+}

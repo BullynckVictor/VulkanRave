@@ -37,6 +37,14 @@ namespace rv
 		typedef std::list<std::shared_ptr<const Event>> EventQueue;
 	}
 
+	class EventQueueBase
+	{
+	protected:
+		std::list<detail::EventQueue> queues;
+		std::mutex mutex;
+		friend class EventListener;
+	};
+
 	class EventListener
 	{
 	public:
@@ -51,15 +59,18 @@ namespace rv
 
 	private:
 		std::list<detail::EventQueue>::iterator queue;
-		ORef<std::list<detail::EventQueue>> parent;
-		ORef<std::mutex> mutex;
+		ORef<EventQueueBase> parent;
+		std::shared_ptr<const bool> parent_alive;
 
 		friend class EventQueue;
 	};
 
-	class EventQueue
+	class EventQueue : public EventQueueBase
 	{
 	public:
+		EventQueue();
+		~EventQueue();
+
 		EventListener Listen();
 		template<typename E>
 		void Push(const E& event)
@@ -85,8 +96,7 @@ namespace rv
 		}
 
 	private:
-		std::list<detail::EventQueue> queues;
-		std::mutex mutex;
+		std::shared_ptr<bool> alive;
 	};
 
 	class EventQueueInterface
