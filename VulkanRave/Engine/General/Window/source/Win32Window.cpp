@@ -28,10 +28,14 @@ LPTSTR rv::WindowClass::GetIdentifier() const
 	return reinterpret_cast<LPTSTR>(atom);
 }
 
+typedef HRESULT(WINAPI* PGetDpiForMonitor)(HMONITOR hmonitor, int dpiType, UINT* dpiX, UINT* dpiY);
+WORD GetWindowDPI(HWND hWnd);
+
 rv::Window::Window(const char* title, int width, int height, bool resize)
 	:
 	title(title),
-	size((uint)width, (uint)height)
+	size((uint)width * dpi / 96, (uint)height * dpi / 96),
+	dpi(GetWindowDPI(NULL))
 {
 	DWORD style = (resize ? WS_OVERLAPPEDWINDOW : WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU);
 
@@ -67,6 +71,8 @@ rv::Window::Window(const char* title, int width, int height, bool resize)
 	mouseInput.dwFlags = 0;
 	mouseInput.hwndTarget = nullptr;
 	rv_not_null_win32(RegisterRawInputDevices(&mouseInput, 1, sizeof(RAWINPUTDEVICE)));
+
+	dpi = GetWindowDPI(hwnd);
 }
 
 rv::Window::~Window()
@@ -133,6 +139,11 @@ const rv::Size& rv::Window::GetSize() const
 	return size;
 }
 
+const rv::uint& rv::Window::DPI() const
+{
+	return dpi;
+}
+
 const rv::WindowClass rv::Window::CreateClass()
 {
 	WNDCLASSEX wnd {};
@@ -180,6 +191,11 @@ LRESULT rv::Window::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 			else if (wParam == SIZE_RESTORED || wParam == SIZE_MAXIMIZED)
 				minimized = false;
 			queue.Push<WindowResizeEvent>(Size(LOWORD(lParam), HIWORD(lParam)));
+		}
+		return 0;
+		case WM_DPICHANGED:
+		{
+			dpi = LOWORD(wParam);
 		}
 		return 0;
 
@@ -338,7 +354,36 @@ LRESULT rv::Window::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 	return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
-#endif
+WORD GetWindowDPI(HWND hWnd)
+{
+	// Try to get the DPI setting for the monitor where the given window is located.
+	// This API is Windows 8.1+.
+	if (hWnd)
+	{
+		HMODULE hShcore = LoadLibrary("shcore");
+		if (hShcore)
+		{
+			PGetDpiForMonitor pGetDpiForMonitor =
+				reinterpret_cast<PGetDpiForMonitor>(GetProcAddress(hShcore, "GetDpiForMonitor"));
+			if (pGetDpiForMonitor)
+			{
+				HMONITOR hMonitor = rv_not_null_win32(MonitorFromWindow(hWnd, MONITOR_DEFAULTTOPRIMARY));
+				UINT uiDpiX;
+				UINT uiDpiY;
+				rv_check_hr(pGetDpiForMonitor(hMonitor, 0, &uiDpiX, &uiDpiY));
+				return static_cast<WORD>(uiDpiX);
+			}
+		}
+	}
+
+	// We couldn't get the window's DPI above, so get the DPI of the primary monitor
+	// using an API that is available in all Windows versions.
+	HDC hScreenDC = GetDC(0);
+	int iDpiX = GetDeviceCaps(hScreenDC, LOGPIXELSX);
+	ReleaseDC(0, hScreenDC);
+
+	return static_cast<WORD>(iDpiX);
+}
 
 const char* WMToString(UINT wm)
 {
@@ -637,3 +682,5 @@ const char* WMToString(UINT wm)
 	}
 	return "???";
 }
+
+#endif

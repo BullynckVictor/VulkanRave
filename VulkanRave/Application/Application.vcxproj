@@ -174,6 +174,9 @@
       <Project>{79f0221a-69cd-4164-8539-e04c9b5ee592}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Manifest Include=".manifest" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

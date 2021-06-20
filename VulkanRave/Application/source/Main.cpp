@@ -24,6 +24,7 @@ void main()
 
 	rv::uint frames = 0;
 	rv::debug.Log(rv::str("init time: ", timer.Mark(), "s"));
+	rv::debug.Log(rv::str(window.GetSize().width, ", ", window.GetSize().height));
 	while (window.Open())
 	{
 		if constexpr (rv::build.debug)
