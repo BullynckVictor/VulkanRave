@@ -105,6 +105,17 @@ void rv::Window::SetTitle(const std::string& newtitle)
 	rv_not_null_win32(SetWindowText(hwnd, title.c_str()));
 }
 
+rv::vk::Surface rv::Window::Surface(Instance& instance) const
+{
+	VkSurfaceKHR surface = VK_NULL_HANDLE;
+	VkWin32SurfaceCreateInfoKHR createInfo{};
+	createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+	createInfo.hwnd = hwnd;
+	createInfo.hinstance = wndClass.windowClass.hInstance;
+	rv_check_vkr(vkCreateWin32SurfaceKHR(instance.instance, &createInfo, nullptr, &surface));
+	return surface;
+}
+
 bool rv::Window::Minimized() const
 {
 	return minimized;

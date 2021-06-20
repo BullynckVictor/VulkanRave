@@ -27,6 +27,7 @@ namespace rv
 		void Release();
 
 		VkInstance instance = VK_NULL_HANDLE;
+		std::vector<const char*> validation;
 	};
 
 	extern Instance* static_instance;

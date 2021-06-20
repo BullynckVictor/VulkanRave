@@ -3,6 +3,7 @@
 #include "General/Event.h"
 #include "General/Window/Keyboard.h"
 #include "General/Window/Mouse.h"
+#include "Graphics/VulkanPointer.h"
 #include <mutex>
 
 #ifndef RV_PLATFORM_WINDOWS
@@ -37,6 +38,8 @@ namespace rv
 
 		const std::string& GetTitle() const;
 		void SetTitle(const std::string& title);
+
+		vk::Surface Surface(Instance& instance) const;
 
 		bool Minimized() const;
 		void Minimize();

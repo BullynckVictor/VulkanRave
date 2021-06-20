@@ -38,14 +38,16 @@ rv::EventListener rv::EventQueue::Listen()
 rv::EventListener::EventListener(EventListener&& rhs) noexcept
 	:
 	queue(rhs.queue),
-	parent(std::move(rhs.parent))
+	parent(std::move(rhs.parent)),
+	parent_alive(std::move(rhs.parent_alive))
 {
 }
 
 rv::EventListener& rv::EventListener::operator=(EventListener&& rhs) noexcept
 {
 	rv_assert(parent == rhs.parent);
-	if (parent.valid() && parent_alive.get())
+	parent_alive = std::move(rhs.parent_alive);
+	if (parent.valid() && *parent_alive.get())
 	{
 		std::lock_guard<std::mutex> guard(parent.get().mutex);
 		parent.get().queues.erase(queue);
@@ -57,7 +59,7 @@ rv::EventListener& rv::EventListener::operator=(EventListener&& rhs) noexcept
 
 rv::EventListener::~EventListener() noexcept
 {
-	if (parent.valid() && parent_alive.get())
+	if (parent.valid() && *parent_alive.get())
 	{
 		std::lock_guard<std::mutex> guard(parent.get().mutex);
 		parent.get().queues.erase(queue);

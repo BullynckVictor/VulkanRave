@@ -2,6 +2,7 @@
 #include "General/Event.h"
 #include "General/System.h"
 #include "General/MessageType.h"
+#include "Utilities/String.h"
 #include <sstream>
 #include <chrono>
 #include <type_traits>
@@ -95,3 +96,11 @@ namespace rv
 
 	extern DebugLogger debug;
 }
+
+#ifdef RV_DEBUG
+#	define RV_DEBUG_LOG(l) rv::debug.Log(rv::str(l))
+#	define rv_debug_log(l) rv::debug.Log(rv::str(l))
+#else
+#	define RV_DEBUG_LOG(l)
+#	define rv_debug_log(l)
+#endif

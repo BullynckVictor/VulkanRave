@@ -24,5 +24,5 @@ namespace rv
 	};
 
 	template<typename I, typename T = u32>
-	static ID<I, T> unique_id() { static T id = 0; return id++; }
+	static ID<I, T> unique_id() { static T id = 0; return ++id; }
 }

@@ -193,12 +193,16 @@
     <ClInclude Include="General\Event.h" />
     <ClInclude Include="General\Window\WindowEvents.h" />
     <ClInclude Include="Graphics\DebugMessenger.h" />
+    <ClInclude Include="Graphics\Device.h" />
     <ClInclude Include="Graphics\Instance.h" />
+    <ClInclude Include="Utilities\Typeless.h" />
+    <ClInclude Include="Utilities\OptionalIndex.h" />
     <ClInclude Include="Graphics\Vulkan.h" />
     <ClInclude Include="Graphics\VulkanPointer.h" />
     <ClInclude Include="Utilities\Exception.h" />
     <ClInclude Include="Utilities\Flag.h" />
     <ClInclude Include="Utilities\ID.h" />
+    <ClInclude Include="Utilities\Range.h" />
     <ClInclude Include="Utilities\Reference.h" />
     <ClInclude Include="Utilities\String.h" />
     <ClInclude Include="Utilities\Timer.h" />
@@ -215,6 +219,7 @@
     <ClCompile Include="General\Window\source\Window.cpp" />
     <ClCompile Include="General\source\Event.cpp" />
     <ClCompile Include="General\Window\source\WindowEvents.cpp" />
+    <ClCompile Include="Graphics\source\Device.cpp" />
     <ClCompile Include="Graphics\source\DebugMessenger.cpp" />
     <ClCompile Include="Graphics\source\Instance.cpp" />
     <ClCompile Include="Utilities\source\Exception.cpp" />
