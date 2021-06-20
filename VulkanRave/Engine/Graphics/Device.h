@@ -72,4 +72,6 @@ namespace rv
 		VkDevice device = VK_NULL_HANDLE;
 		PhysicalDevice physicalDevice;
 	};
+
+	extern Device* static_device;
 }

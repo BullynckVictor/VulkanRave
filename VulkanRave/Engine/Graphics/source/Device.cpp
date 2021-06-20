@@ -1,5 +1,6 @@
 #include "Graphics/Device.h"
 #include "Graphics/VulkanPointer.h"
+#include "Graphics/SwapChain.h"
 #include "Utilities/Exception.h"
 #include "Utilities/String.h"
 #include "Utilities/Range.h"
@@ -10,6 +11,8 @@
 
 template<>
 void rv::destroy<VkDevice>(VkDevice device) { vkDestroyDevice(device, nullptr); }
+
+rv::Device* rv::static_device = nullptr;
 
 rv::Device::Device(Instance& instance, const DeviceRequirements& requirements)
 {
@@ -52,7 +55,9 @@ rv::Device::Device(Instance& instance, const DeviceRequirements& requirements)
 	createInfo.enabledExtensionCount = (u32)requirements.extensions.size();
 
 	rv_check_vkr(vkCreateDevice(physicalDevice.device, &createInfo, nullptr, &device));	
-	debug.Log(str("Created Device \"", physicalDevice.properties.deviceName, "\""));
+	debug.Log(RV_MT_INFO, str("Created Device \"", physicalDevice.properties.deviceName, "\""));
+
+	static_device = this;
 }
 
 rv::Device::Device(Device&& rhs) noexcept
@@ -211,7 +216,12 @@ bool rv::QueueCanPresent(const PhysicalDevice& device, uint32 index, RawT surfac
 {
 	VkBool32 presentSupport = VK_FALSE;
 	rv_check_vkr(vkGetPhysicalDeviceSurfaceSupportKHR(device.device, index, surface.as<VkSurfaceKHR>(), &presentSupport));
-	return presentSupport;
+	if (presentSupport)
+	{
+		SwapChainSupportDetails details(device, surface.as<VkSurfaceKHR>());
+		return !details.formats.empty() && !details.presentModes.empty();
+	}
+	return false;
 }
 
 rv::DeviceRequirements rv::GraphicsRequirements(VkSurfaceKHR surface)

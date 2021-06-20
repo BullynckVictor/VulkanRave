@@ -195,6 +195,7 @@
     <ClInclude Include="Graphics\DebugMessenger.h" />
     <ClInclude Include="Graphics\Device.h" />
     <ClInclude Include="Graphics\Instance.h" />
+    <ClInclude Include="Graphics\Swapchain.h" />
     <ClInclude Include="Utilities\Typeless.h" />
     <ClInclude Include="Utilities\OptionalIndex.h" />
     <ClInclude Include="Graphics\Vulkan.h" />
@@ -222,6 +223,7 @@
     <ClCompile Include="Graphics\source\Device.cpp" />
     <ClCompile Include="Graphics\source\DebugMessenger.cpp" />
     <ClCompile Include="Graphics\source\Instance.cpp" />
+    <ClCompile Include="Graphics\source\Swapchain.cpp" />
     <ClCompile Include="Utilities\source\Exception.cpp" />
     <ClCompile Include="Utilities\source\hresults.cpp" />
     <ClCompile Include="Utilities\source\Reference.cpp" />

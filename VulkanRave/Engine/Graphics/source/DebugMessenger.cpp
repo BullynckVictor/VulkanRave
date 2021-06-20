@@ -22,8 +22,8 @@ VKAPI_ATTR VkBool32 VKAPI_CALL rv::debugCallback(VkDebugUtilsMessageSeverityFlag
 	else if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
 		mt = RV_MT_ERROR;
 	debug.Log(pCallbackData->pMessage);
-	if (auto* messenger = reinterpret_cast<DebugMessenger*>(pUserData))
-		messenger->Post({ mt, pCallbackData->pMessage });
+	if (auto** messenger = reinterpret_cast<DebugMessenger**>(pUserData))
+		(*messenger)->Post({ mt, pCallbackData->pMessage });
 	if (DebugMessenger::static_failed)
 		if (mt == RV_MT_ERROR)
 			*DebugMessenger::static_failed = true;
@@ -31,9 +31,11 @@ VKAPI_ATTR VkBool32 VKAPI_CALL rv::debugCallback(VkDebugUtilsMessageSeverityFlag
 }
 
 rv::DebugMessenger::DebugMessenger(Instance& instance)
+	:
+	thisptr(std::make_unique<DebugMessenger*>(this))
 {
 	VkDebugUtilsMessengerCreateInfoEXT createInfo = CreateInfo();
-	createInfo.pUserData = this;
+	createInfo.pUserData = thisptr.get();
 
 	auto func = rv_not_null((PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance.instance, "vkCreateDebugUtilsMessengerEXT"));
 	rv_check_vkr(func(instance.instance, &createInfo, nullptr, &messenger));
@@ -41,8 +43,10 @@ rv::DebugMessenger::DebugMessenger(Instance& instance)
 
 rv::DebugMessenger::DebugMessenger(DebugMessenger&& rhs) noexcept
 	:
-	messenger(move(rhs.messenger))
+	messenger(move(rhs.messenger)),
+	thisptr(std::move(rhs.thisptr))
 {
+	*thisptr = this;
 }
 
 rv::DebugMessenger::~DebugMessenger() noexcept
@@ -54,6 +58,8 @@ rv::DebugMessenger& rv::DebugMessenger::operator=(DebugMessenger&& rhs) noexcept
 {
 	Release();
 	messenger = move(rhs.messenger);
+	thisptr = std::move(rhs.thisptr);
+	*thisptr = this;
 	return *this;
 }
 
@@ -71,7 +77,7 @@ VkDebugUtilsMessengerCreateInfoEXT rv::DebugMessenger::CreateInfo()
 {
 	VkDebugUtilsMessengerCreateInfoEXT createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-	createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+	createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
 	createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
 	createInfo.pfnUserCallback = debugCallback;
 	createInfo.pUserData = nullptr;

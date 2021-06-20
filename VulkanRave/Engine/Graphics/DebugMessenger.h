@@ -2,6 +2,7 @@
 #include "Graphics/Instance.h"
 #include "General/Event.h"
 #include "General/MessageType.h"
+#include <memory>
 
 namespace rv
 {
@@ -41,5 +42,8 @@ namespace rv
 
 		VkDebugUtilsMessengerEXT messenger = VK_NULL_HANDLE;
 		static bool* static_failed;
+
+	private:
+		std::unique_ptr<DebugMessenger*> thisptr;
 	};
 }

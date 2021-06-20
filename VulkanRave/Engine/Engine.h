@@ -14,5 +14,6 @@
 #include "Graphics/DebugMessenger.h"
 #include "Graphics/Device.h"
 #include "Graphics/VulkanPointer.h"
+#include "Graphics/Swapchain.h"
 
 using namespace std::chrono_literals;

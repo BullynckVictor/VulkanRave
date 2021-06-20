@@ -30,7 +30,8 @@ LPTSTR rv::WindowClass::GetIdentifier() const
 
 rv::Window::Window(const char* title, int width, int height, bool resize)
 	:
-	title(title)
+	title(title),
+	size((uint)width, (uint)height)
 {
 	DWORD style = (resize ? WS_OVERLAPPEDWINDOW : WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU);
 
@@ -125,6 +126,11 @@ void rv::Window::Minimize()
 {
 	std::lock_guard<std::mutex> guard(mutex);
 	ShowWindow(hwnd, SW_HIDE);
+}
+
+const rv::Size& rv::Window::GetSize() const
+{
+	return size;
 }
 
 const rv::WindowClass rv::Window::CreateClass()

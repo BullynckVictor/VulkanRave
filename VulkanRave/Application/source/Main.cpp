@@ -1,10 +1,11 @@
 #include "Engine/Engine.h"
+#include <d3d11.h>
 
 void main()
 {
 	rv::Timer timer;
 	rv::WindowManager manager;
-	rv::Window& window = manager.Create("Hello World!", 600, 400, true);
+	rv::Window& window = manager.Create("Vulkan Rave Application", 600, 400, true);
 	rv::EventListener listener = window.Listen();
 
 	rv::Instance instance;
@@ -18,6 +19,8 @@ void main()
 	rv::Device device(instance, rv::GraphicsRequirements(surface.get()));
 	rv::DeviceQueue graphicsQueue = device.Queue({ rv::QueueContainsFlag, VK_QUEUE_GRAPHICS_BIT });
 	rv::DeviceQueue presentQueue = device.Queue({ rv::QueueCanPresent, surface.get() });
+
+	rv::SwapChain swap(device, surface.get(), rv::DefaultSwap(), window.GetSize());
 
 	rv::uint frames = 0;
 	rv::debug.Log(rv::str("init time: ", timer.Mark(), "s"));

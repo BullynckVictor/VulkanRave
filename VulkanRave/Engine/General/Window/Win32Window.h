@@ -44,6 +44,8 @@ namespace rv
 		bool Minimized() const;
 		void Minimize();
 
+		const Size& GetSize() const;
+
 		Keyboard keyboard;
 		Mouse mouse;
 
@@ -58,6 +60,7 @@ namespace rv
 
 		HWND hwnd = NULL;
 		std::string title;
+		Size size;
 
 		bool minimized = false;
 
