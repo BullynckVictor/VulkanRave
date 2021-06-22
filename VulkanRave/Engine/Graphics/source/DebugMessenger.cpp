@@ -4,7 +4,7 @@
 #include "General/Logger.h"
 
 const rv::EventID rv::VulkanDebugEvent::static_event = rv::unique_event_id();
-bool* rv::DebugMessenger::static_failed = nullptr;
+bool rv::DebugMessenger::static_failed = false;
 
 template<>
 void rv::destroy<VkDebugUtilsMessengerEXT>(VkDebugUtilsMessengerEXT messenger)
@@ -23,10 +23,20 @@ VKAPI_ATTR VkBool32 VKAPI_CALL rv::debugCallback(VkDebugUtilsMessageSeverityFlag
 		mt = RV_MT_ERROR;
 	debug.Log(pCallbackData->pMessage);
 	if (auto** messenger = reinterpret_cast<DebugMessenger**>(pUserData))
+	{
 		(*messenger)->Post({ mt, pCallbackData->pMessage });
-	if (DebugMessenger::static_failed)
-		if (mt == RV_MT_ERROR)
-			*DebugMessenger::static_failed = true;
+		if (mt == RV_MT_ERROR && !(*messenger)->failed)
+		{
+			(*messenger)->failed = true;
+			DebugMessenger::static_failed = true;
+			rv_throw(pCallbackData->pMessage);
+		}
+	}
+	else if (mt == RV_MT_ERROR && !DebugMessenger::static_failed)
+	{
+		DebugMessenger::static_failed = true;
+		rv_throw(pCallbackData->pMessage);
+	}
 	return VK_FALSE;
 }
 
@@ -82,4 +92,14 @@ VkDebugUtilsMessengerCreateInfoEXT rv::DebugMessenger::CreateInfo()
 	createInfo.pfnUserCallback = debugCallback;
 	createInfo.pUserData = nullptr;
 	return createInfo;
+}
+
+bool rv::DebugMessenger::Failed() const
+{
+	return failed;
+}
+
+bool rv::DebugMessenger::StaticFailed()
+{
+	return static_failed;
 }

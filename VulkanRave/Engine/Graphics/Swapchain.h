@@ -1,5 +1,6 @@
 #pragma once
 #include "Graphics/Device.h"
+#include "Graphics/ImageView.h"
 #include "Utilities/Vector.h"
 
 namespace rv
@@ -41,6 +42,7 @@ namespace rv
 		VkSwapchainKHR swapchain = VK_NULL_HANDLE;
 		VkSurfaceKHR surface = VK_NULL_HANDLE;
 		std::vector<VkImage> images;
+		std::vector<ImageView> views;
 		VkSurfaceFormatKHR format {};
 		VkPresentModeKHR presentMode {};
 		VkExtent2D extent {};

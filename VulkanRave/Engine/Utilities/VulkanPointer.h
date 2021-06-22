@@ -15,7 +15,7 @@ namespace rv
 	}
 
 	template<typename T>
-	T&& move(T&& pointer)
+	T move(T& pointer)
 	{
 		T temp = pointer;
 		pointer = VK_NULL_HANDLE;

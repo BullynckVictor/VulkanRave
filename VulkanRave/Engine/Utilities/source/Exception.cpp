@@ -1,7 +1,7 @@
 #include "Utilities/Exception.h"
 #include "Utilities/String.h"
 #include "General/System.h"
-#include <filesystem>
+#include "Utilities/File.h"
 
 rv::Exception::Exception(const char* exceptionName, const char* source, int line, const std::string& message)
 	:
@@ -61,11 +61,6 @@ void rv::__rv_assert_func(bool condition, const char* str_condition, const std::
 	if constexpr (build.debug)
 		if (!condition)
 			throw FailedAssertion(str_condition, message, source, line);
-}
-
-bool rv::FileExists(const char* filename)
-{
-	return std::filesystem::exists(filename);
 }
 
 void rv::__rv_assert_file_func(const char* file, const char* source, int line)

@@ -40,10 +40,21 @@ namespace rv
 		void Release();
 		static VkDebugUtilsMessengerCreateInfoEXT CreateInfo();
 
+		bool Failed() const;
+		static bool StaticFailed();
+
 		VkDebugUtilsMessengerEXT messenger = VK_NULL_HANDLE;
-		static bool* static_failed;
 
 	private:
 		std::unique_ptr<DebugMessenger*> thisptr;
+		bool failed = false;
+		static bool static_failed;
+
+		friend VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
+			VkDebugUtilsMessageSeverityFlagBitsEXT,
+			VkDebugUtilsMessageTypeFlagsEXT,
+			const VkDebugUtilsMessengerCallbackDataEXT*,
+			void*
+		);
 	};
 }

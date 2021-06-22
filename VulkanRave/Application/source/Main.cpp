@@ -20,7 +20,23 @@ void main()
 	rv::DeviceQueue graphicsQueue = device.Queue({ rv::QueueContainsFlag, VK_QUEUE_GRAPHICS_BIT });
 	rv::DeviceQueue presentQueue = device.Queue({ rv::QueueCanPresent, surface.get() });
 
+	rv::Shader frag = rv::Shader(device, "../Engine/Graphics/Shaders/bin/triangle.frag.spv");
+	rv::Shader vert = rv::Shader(device, "../Engine/Graphics/Shaders/bin/triangle.vert.spv");
+
 	rv::SwapChain swap(device, surface.get(), rv::DefaultSwap(), window.GetSize());
+
+	rv::PipelineLayout layout;
+	rv::RenderPassDescriptor pass;
+	pass.CreateSubpass();
+	pass.subpasses[0].AddColor(rv::attachments::Color(swap.format.format));
+	layout.pass = rv::RenderPass(device, pass);
+	layout.AddShader(frag);
+	layout.AddShader(vert);
+	layout.SetBlending(true);
+	layout.SetSize(window.GetSize());
+	layout.Finalize(device);
+
+	rv::Pipeline pipeline(device, layout);
 
 	rv::uint frames = 0;
 	rv::debug.Log(rv::str("init time: ", timer.Mark(), "s"));

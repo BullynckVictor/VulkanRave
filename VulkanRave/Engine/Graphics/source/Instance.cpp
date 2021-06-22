@@ -47,22 +47,17 @@ rv::Instance::Instance(const AppInfo& app)
 	createInfo.enabledLayerCount = (u32)app.layers.size();
 	createInfo.ppEnabledLayerNames = app.layers.data();
 
-	bool failed = false;
 	VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
 	if constexpr (build.debug)
 	{
 		debugCreateInfo = DebugMessenger::CreateInfo();
 		createInfo.pNext = &debugCreateInfo;
-		DebugMessenger::static_failed = &failed;
 	}
 
 	rv_check_vkr(vkCreateInstance(&createInfo, nullptr, &instance));
 	debug.Log(str("Created Instance \"", app.info.pApplicationName, "\""));
 	if constexpr (build.debug)
-	{
-		rv_assert(!failed);
-		DebugMessenger::static_failed = nullptr;
-	}
+		rv_assert(!DebugMessenger::StaticFailed());
 
 	uint32 nLayers = 0;
 	vkEnumerateInstanceLayerProperties(&nLayers, nullptr);

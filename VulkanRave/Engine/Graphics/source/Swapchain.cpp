@@ -125,6 +125,9 @@ rv::SwapChain::SwapChain(Device& device, VkSurfaceKHR surface, const SwapChainSe
 	rv_check_vkr(vkGetSwapchainImagesKHR(device.device, swapchain, &nImages, nullptr));
 	images.resize(nImages);
 	rv_check_vkr(vkGetSwapchainImagesKHR(device.device, swapchain, &nImages, images.data()));
+
+	views.resize(nImages);
+	std::transform(images.begin(), images.end(), views.begin(), [&device, this](VkImage image) { return ImageView(device, image, format.format); });
 }
 
 rv::SwapChain::SwapChain(SwapChain&& rhs) noexcept
@@ -132,6 +135,7 @@ rv::SwapChain::SwapChain(SwapChain&& rhs) noexcept
 	swapchain(move(rhs.swapchain)),
 	surface(rhs.surface),
 	images(std::move(rhs.images)),
+	views(std::move(rhs.views)),
 	format(rhs.format),
 	presentMode(rhs.presentMode),
 	extent(rhs.extent)
@@ -148,6 +152,7 @@ rv::SwapChain& rv::SwapChain::operator=(SwapChain&& rhs) noexcept
 	Release();
 	swapchain = move(rhs.swapchain);
 	images = std::move(rhs.images);
+	views = std::move(rhs.views);
 	surface = rhs.surface;
 	format = rhs.format;
 	presentMode = rhs.presentMode;
@@ -156,6 +161,8 @@ rv::SwapChain& rv::SwapChain::operator=(SwapChain&& rhs) noexcept
 	rhs.format = {};
 	rhs.presentMode = {};
 	rhs.extent = {};
+	images.clear();
+	views.clear();
 	return *this;
 }
 
@@ -166,6 +173,8 @@ void rv::SwapChain::Release()
 	format = {};
 	presentMode = {};
 	extent = {};
+	images.clear();
+	views.clear();
 }
 
 rv::SwapChainSettings rv::DefaultSwap(bool vsync)

@@ -15,5 +15,7 @@
 #include "Graphics/Device.h"
 #include "Graphics/VulkanPointer.h"
 #include "Graphics/Swapchain.h"
+#include "Graphics/Shader.h"
+#include "Graphics/Pipeline.h"
 
 using namespace std::chrono_literals;
