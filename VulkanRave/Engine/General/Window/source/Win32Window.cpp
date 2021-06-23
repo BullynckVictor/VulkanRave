@@ -41,9 +41,9 @@ rv::Window::Window(const char* title, int width, int height, bool resize)
 
 	RECT wr;
 	wr.left = 100;
-	wr.right = width + wr.left;
+	wr.right = size.width + wr.left;
 	wr.top = 100;
-	wr.bottom = height + wr.top;
+	wr.bottom = size.height + wr.top;
 	rv_assert(AdjustWindowRect(&wr, style, FALSE));
 
 	hwnd = rv_not_null_win32(CreateWindowEx(

@@ -239,3 +239,8 @@ bool rv::QueueChecker::operator==(const QueueChecker& rhs) const
 {
 	return func == rhs.func && data == rhs.data;
 }
+
+void rv::DeviceQueue::Wait()
+{
+	rv_check_vkr(vkQueueWaitIdle(queue));
+}

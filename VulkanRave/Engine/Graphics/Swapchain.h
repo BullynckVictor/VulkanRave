@@ -1,7 +1,9 @@
 #pragma once
 #include "Graphics/Device.h"
 #include "Graphics/ImageView.h"
+#include "Graphics/Sync.h"
 #include "Utilities/Vector.h"
+#include "Utilities/Reference.h"
 
 namespace rv
 {
@@ -38,6 +40,9 @@ namespace rv
 		SwapChain& operator= (SwapChain&& rhs) noexcept;
 
 		void Release();
+
+		uint32 AcquireNextImage(Device& device, ORef<Semaphore> semaphore, ORef<Fence> fence, uint64 timeout = std::numeric_limits<u64>::max());
+		void Present(DeviceQueue& presentQueue, u32 index, const VkSemaphore* wait, u32 nWait);
 
 		VkSwapchainKHR swapchain = VK_NULL_HANDLE;
 		VkSurfaceKHR surface = VK_NULL_HANDLE;

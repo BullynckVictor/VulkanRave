@@ -30,6 +30,7 @@ namespace rv
 		uint32 CreateSubpass();
 		std::vector<VkAttachmentDescription> attachments;
 		std::vector<Subpass> subpasses;
+		std::vector<VkSubpassDependency> dependencies;
 	};
 
 	struct RenderPass
@@ -52,5 +53,9 @@ namespace rv
 	{
 		VkAttachmentDescription Color(const VkFormat& format, const VkImageLayout& layout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 		VkAttachmentDescription Clear(const VkFormat& format, const VkImageLayout& layout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+	}
+	namespace dependencies
+	{
+		VkSubpassDependency Color(u32 index);
 	}
 }

@@ -209,6 +209,11 @@ void rv::PipelineLayout::SetBlending(bool blend, uint nAttachments)
 	colorBlending.pAttachments = colorBlendAttachments.data();
 }
 
+void rv::PipelineLayout::SetCulling(bool cull)
+{
+	rasterizer.cullMode = cull ? VK_CULL_MODE_BACK_BIT : VK_CULL_MODE_NONE;
+}
+
 void rv::PipelineLayout::AddShader(const Shader& shader)
 {
 	shaders.push_back(shader.PipelineStage());
@@ -232,7 +237,7 @@ rv::Pipeline::Pipeline(Device& device, const PipelineLayout& layout, u32 subpass
 	pipelineInfo.pViewportState = &layout.viewportState;
 	pipelineInfo.pRasterizationState = &layout.rasterizer;
 	pipelineInfo.pMultisampleState = &layout.multisampling;
-	pipelineInfo.pDepthStencilState = &layout.depthStencil;
+//	pipelineInfo.pDepthStencilState = &layout.depthStencil;
 	pipelineInfo.pColorBlendState = &layout.colorBlending;
 	pipelineInfo.pDynamicState = &layout.dynamicState;
 	pipelineInfo.layout = layout.layout;

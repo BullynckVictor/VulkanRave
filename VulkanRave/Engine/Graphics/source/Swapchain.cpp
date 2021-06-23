@@ -177,6 +177,32 @@ void rv::SwapChain::Release()
 	views.clear();
 }
 
+rv::uint32 rv::SwapChain::AcquireNextImage(Device& device, ORef<Semaphore> semaphore, ORef<Fence> fence, uint64 timeout)
+{
+	u32 index = 0;
+	rv_check_vkr(vkAcquireNextImageKHR(
+		device.device, 
+		swapchain, 
+		timeout, 
+		semaphore.valid() ? semaphore.get().semaphore : VK_NULL_HANDLE, 
+		fence.valid() ? fence.get().fence : VK_NULL_HANDLE, 
+		&index
+	));
+	return index;
+}
+
+void rv::SwapChain::Present(DeviceQueue& presentQueue, u32 index, const VkSemaphore* wait, u32 nWait)
+{
+	VkPresentInfoKHR presentInfo{};
+	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+	presentInfo.waitSemaphoreCount = nWait;
+	presentInfo.pWaitSemaphores = wait;
+	presentInfo.swapchainCount = 1;
+	presentInfo.pSwapchains = &swapchain;
+	presentInfo.pImageIndices = &index;
+	rv_check_vkr(vkQueuePresentKHR(presentQueue.queue, &presentInfo));
+}
+
 rv::SwapChainSettings rv::DefaultSwap(bool vsync)
 {
 	SwapChainSettings settings;

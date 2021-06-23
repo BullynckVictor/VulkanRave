@@ -36,6 +36,7 @@ namespace rv
 	{
 		VkQueue queue = VK_NULL_HANDLE;
 		uint32 index = 0;
+		void Wait();
 	};
 
 	struct PhysicalDevice

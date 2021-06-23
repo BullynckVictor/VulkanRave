@@ -24,6 +24,7 @@ namespace rv
 		void SetSize(const Size& size);
 		void SetTopology(const VkPrimitiveTopology& topology);
 		void SetBlending(bool blend, uint nAttachments = 1);
+		void SetCulling(bool cull);
 		void AddShader(const Shader& shader);
 		void AddDynamicState(const VkDynamicState& state);
 
@@ -59,5 +60,11 @@ namespace rv
 		void Release();
 
 		VkPipeline pipeline = VK_NULL_HANDLE;
+	};
+
+	enum PipelineType
+	{
+		RV_PT_GRAPHICS,
+		RV_PT_COMPUTE
 	};
 }
