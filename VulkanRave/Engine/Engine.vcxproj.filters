@@ -161,9 +161,6 @@
     <ClCompile Include="Utilities\source\hresults.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="General\Window\source\Window.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Utilities\source\Timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

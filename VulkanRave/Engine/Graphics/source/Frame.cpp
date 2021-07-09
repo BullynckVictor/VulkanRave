@@ -44,13 +44,18 @@ void rv::Frame::Release()
 	inFlight.Release();
 }
 
-void rv::Frame::Begin(Device& device, SwapChain& swap, VkFence* flight)
+bool rv::Frame::Begin(Device& device, SwapChain& swap, VkFence* flight)
 {
+	bool recreate = false;
 	inFlight.Wait(device);
-	image = swap.AcquireNextImage(device, imageAvailable, {});
-	if (flight[image] != VK_NULL_HANDLE)
-		reinterpret_cast<Fence&>(flight[image]).Wait(device);
-	flight[image] = inFlight.fence;
+	image = swap.AcquireNextImage(device, imageAvailable, {}, recreate);
+	if (!recreate)
+	{
+		if (flight[image] != VK_NULL_HANDLE)
+			reinterpret_cast<Fence&>(flight[image]).Wait(device);
+		flight[image] = inFlight.fence;
+	}
+	return recreate;
 }
 
 void rv::Frame::Submit(Device& device, DeviceQueue& graphicsQueue, CommandBuffer& command)
@@ -60,7 +65,7 @@ void rv::Frame::Submit(Device& device, DeviceQueue& graphicsQueue, CommandBuffer
 	command.Submit(graphicsQueue, &imageAvailable.semaphore, waitStages, 1, &renderFinished.semaphore, 1, &inFlight);
 }
 
-void rv::Frame::Present(SwapChain& swap, DeviceQueue& presentQueue)
+bool rv::Frame::Present(SwapChain& swap, DeviceQueue& presentQueue)
 {
-	swap.Present(presentQueue, image, &renderFinished.semaphore, 1);
+	return swap.Present(presentQueue, image, &renderFinished.semaphore, 1);
 }

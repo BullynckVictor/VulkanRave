@@ -17,9 +17,9 @@ namespace rv
 
 		void Release();
 
-		void Begin(Device& device, SwapChain& swap, VkFence* flight);
+		bool Begin(Device& device, SwapChain& swap, VkFence* flight);
 		void Submit(Device& device, DeviceQueue& graphicsQueue, CommandBuffer& command);
-		void Present(SwapChain& swap, DeviceQueue& presentQueue);
+		bool Present(SwapChain& swap, DeviceQueue& presentQueue);
 
 		Semaphore imageAvailable;
 		Semaphore renderFinished;

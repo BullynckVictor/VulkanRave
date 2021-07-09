@@ -41,8 +41,8 @@ namespace rv
 
 		void Release();
 
-		uint32 AcquireNextImage(Device& device, ORef<Semaphore> semaphore, ORef<Fence> fence, uint64 timeout = std::numeric_limits<u64>::max());
-		void Present(DeviceQueue& presentQueue, u32 index, const VkSemaphore* wait, u32 nWait);
+		uint32 AcquireNextImage(Device& device, ORef<Semaphore> semaphore, ORef<Fence> fence, ORef<bool> recreate, uint64 timeout = std::numeric_limits<u64>::max());
+		bool Present(DeviceQueue& presentQueue, u32 index, const VkSemaphore* wait, u32 nWait);
 
 		VkSwapchainKHR swapchain = VK_NULL_HANDLE;
 		VkSurfaceKHR surface = VK_NULL_HANDLE;

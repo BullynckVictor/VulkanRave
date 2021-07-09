@@ -227,7 +227,6 @@
     <ClCompile Include="General\Window\source\Keyboard.cpp" />
     <ClCompile Include="General\Window\source\Mouse.cpp" />
     <ClCompile Include="General\Window\source\Win32Window.cpp" />
-    <ClCompile Include="General\Window\source\Window.cpp" />
     <ClCompile Include="General\source\Event.cpp" />
     <ClCompile Include="General\Window\source\WindowEvents.cpp" />
     <ClCompile Include="Graphics\source\Frame.cpp" />

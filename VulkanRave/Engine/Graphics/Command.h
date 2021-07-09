@@ -36,6 +36,7 @@ namespace rv
 		CommandBuffer& operator= (CommandBuffer&& rhs) noexcept;
 
 		void Release();
+		void Free(Device& device, CommandPool& pool);
 
 		void Begin();
 		void BeginPass(RenderPass& pass, FrameBuffer& frameBuffer, const Size& size, std::optional<FColor> color);

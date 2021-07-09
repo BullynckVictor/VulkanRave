@@ -69,6 +69,13 @@ rv::SwapChain::SwapChain(Device& device, VkSurfaceKHR surface, const SwapChainSe
 
 	//extent
 	{
+		debug.Log(str(
+			"extent\n"
+			"window:  (", windowSize.width, ", ", windowSize.height, ")\n"
+			"current: (", support.capabilities.currentExtent.width, ", ", support.capabilities.currentExtent.height, ")\n"
+			"min:     (", support.capabilities.minImageExtent.width, ", ", support.capabilities.minImageExtent.height, ")\n"
+			"max:     (", support.capabilities.minImageExtent.width, ", ", support.capabilities.minImageExtent.height, ")\n"
+		));
 		if (support.capabilities.currentExtent.width != UINT32_MAX)
 			extent = support.capabilities.currentExtent;
 		else
@@ -161,8 +168,8 @@ rv::SwapChain& rv::SwapChain::operator=(SwapChain&& rhs) noexcept
 	rhs.format = {};
 	rhs.presentMode = {};
 	rhs.extent = {};
-	images.clear();
-	views.clear();
+	rhs.images.clear();
+	rhs.views.clear();
 	return *this;
 }
 
@@ -177,21 +184,25 @@ void rv::SwapChain::Release()
 	views.clear();
 }
 
-rv::uint32 rv::SwapChain::AcquireNextImage(Device& device, ORef<Semaphore> semaphore, ORef<Fence> fence, uint64 timeout)
+rv::uint32 rv::SwapChain::AcquireNextImage(Device& device, ORef<Semaphore> semaphore, ORef<Fence> fence, ORef<bool> recreate, uint64 timeout)
 {
 	u32 index = 0;
-	rv_check_vkr(vkAcquireNextImageKHR(
+	auto result = vkAcquireNextImageKHR(
 		device.device, 
 		swapchain, 
 		timeout, 
 		semaphore.valid() ? semaphore.get().semaphore : VK_NULL_HANDLE, 
 		fence.valid() ? fence.get().fence : VK_NULL_HANDLE, 
 		&index
-	));
+	);
+	if ((result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) && recreate.valid())
+		recreate.get() = true;
+	else
+		rv_check_vkr(result);
 	return index;
 }
 
-void rv::SwapChain::Present(DeviceQueue& presentQueue, u32 index, const VkSemaphore* wait, u32 nWait)
+bool rv::SwapChain::Present(DeviceQueue& presentQueue, u32 index, const VkSemaphore* wait, u32 nWait)
 {
 	VkPresentInfoKHR presentInfo{};
 	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -200,7 +211,11 @@ void rv::SwapChain::Present(DeviceQueue& presentQueue, u32 index, const VkSemaph
 	presentInfo.swapchainCount = 1;
 	presentInfo.pSwapchains = &swapchain;
 	presentInfo.pImageIndices = &index;
-	rv_check_vkr(vkQueuePresentKHR(presentQueue.queue, &presentInfo));
+	auto result = vkQueuePresentKHR(presentQueue.queue, &presentInfo);
+	if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
+		return true;
+	rv_check_vkr(result);
+	return false;
 }
 
 rv::SwapChainSettings rv::DefaultSwap(bool vsync)

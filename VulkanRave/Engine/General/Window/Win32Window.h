@@ -31,7 +31,7 @@ namespace rv
 		Window(const char* title, int width, int height, bool resize);
 		~Window();
 
-		void HandleMessages();
+		bool HandleMessages();
 
 		void Close();
 		bool Open();
@@ -66,6 +66,6 @@ namespace rv
 
 		bool minimized = false;
 
-		std::mutex mutex;
+		static u64 nWindows;
 	};
 }

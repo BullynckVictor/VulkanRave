@@ -73,6 +73,11 @@ void rv::CommandBuffer::Release()
 	buffer = VK_NULL_HANDLE;
 }
 
+void rv::CommandBuffer::Free(Device& device, CommandPool& pool)
+{
+	vkFreeCommandBuffers(device.device, pool.pool, 1, &buffer);
+}
+
 void rv::CommandBuffer::Begin()
 {
 	VkCommandBufferBeginInfo beginInfo{};

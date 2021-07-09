@@ -71,6 +71,7 @@ rv::MessageLogger::~MessageLogger()
 		std::ofstream file(dumpFileName);
 		if (file.is_open())
 		{
+			std::lock_guard<std::mutex> guard(mutex);
 			for (const auto& m : queue)
 				file << Format(format, m) << '\n';
 		}
@@ -80,6 +81,7 @@ rv::MessageLogger::~MessageLogger()
 void rv::MessageLogger::Log(const LogMessageEvent& message)
 {
 	Logger::Log(message);
+	std::lock_guard<std::mutex> guard(mutex);
 	queue.push_back(message);
 }
 

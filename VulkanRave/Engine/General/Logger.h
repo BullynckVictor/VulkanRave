@@ -69,6 +69,7 @@ namespace rv
 	protected:
 		static std::string Format(const TimeFormat& format, const LogMessageEvent& event);
 		std::deque<LogMessageEvent> queue;
+		std::mutex mutex;
 	};
 
 	#ifdef RV_DEBUG
@@ -76,7 +77,7 @@ namespace rv
 	class DebugLogger : public MessageLogger
 	{
 	public:
-		DebugLogger(const std::string& dumpFile = "Engine/log.txt");
+		DebugLogger(const std::string& dumpFile = "log.txt");
 
 	private:
 		void OnLog(const LogEvent& message) override;

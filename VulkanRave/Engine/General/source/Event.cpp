@@ -68,7 +68,7 @@ rv::EventListener::~EventListener() noexcept
 
 std::shared_ptr<const rv::Event> rv::EventListener::Get()
 {
-	if (queue->empty())
+	if (!parent.valid()  || queue->empty())
 		return nullptr;
 	std::lock_guard<std::mutex> guard(parent.get().mutex);
 	auto ret = queue->front();

@@ -8,7 +8,7 @@ void error_box(const char* title, const char* text)
 {
 	rv::debug.Log(rv::RV_MT_ERROR, text);
 	if constexpr (rv::sys.windows)
-		MessageBoxA(nullptr, text, title, MB_ICONWARNING | MB_OK);
+		MessageBox(nullptr, text, title, MB_ICONWARNING | MB_OK);
 }
 
 int rv::rave_main()
@@ -16,6 +16,8 @@ int rv::rave_main()
 	try
 	{
 		main();
+		if constexpr (sys.windows)
+			PostQuitMessage(EXIT_SUCCESS);
 		return EXIT_SUCCESS;
 	}
 	catch (const Exception& e)
@@ -30,5 +32,7 @@ int rv::rave_main()
 	{
 		error_box("Unknown exception", "Something went wrong!");
 	}
+	if constexpr (sys.windows)
+		PostQuitMessage(EXIT_FAILURE);
 	return EXIT_FAILURE;
 }

@@ -10,6 +10,7 @@
 #include <hidusage.h>
 
 const rv::WindowClass rv::Window::wndClass = rv::Window::CreateClass();
+rv::u64 rv::Window::nWindows = 0;
 
 rv::WindowClass::WindowClass(const WNDCLASSEX& windowClass)
 	:
@@ -73,13 +74,16 @@ rv::Window::Window(const char* title, int width, int height, bool resize)
 	rv_not_null_win32(RegisterRawInputDevices(&mouseInput, 1, sizeof(RAWINPUTDEVICE)));
 
 	dpi = GetWindowDPI(hwnd);
+
+	nWindows++;
 }
 
 rv::Window::~Window()
 {
+	Close();
 }
 
-void rv::Window::HandleMessages()
+bool rv::Window::HandleMessages()
 {
 	MSG msg = {};
 	while (PeekMessage(&msg, hwnd, 0, 0, PM_REMOVE))
@@ -87,6 +91,7 @@ void rv::Window::HandleMessages()
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
+	return Open();
 }
 
 void rv::Window::Close()
@@ -108,7 +113,6 @@ const std::string& rv::Window::GetTitle() const
 void rv::Window::SetTitle(const std::string& newtitle)
 {
 	title = newtitle;
-	std::lock_guard<std::mutex> guard(mutex);
 	rv_not_null_win32(SetWindowText(hwnd, title.c_str()));
 }
 
@@ -130,7 +134,6 @@ bool rv::Window::Minimized() const
 
 void rv::Window::Minimize()
 {
-	std::lock_guard<std::mutex> guard(mutex);
 	ShowWindow(hwnd, SW_HIDE);
 }
 
@@ -190,7 +193,8 @@ LRESULT rv::Window::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 				minimized = true;
 			else if (wParam == SIZE_RESTORED || wParam == SIZE_MAXIMIZED)
 				minimized = false;
-			queue.Push<WindowResizeEvent>(Size(LOWORD(lParam), HIWORD(lParam)));
+			size = Size(LOWORD(lParam), HIWORD(lParam));
+			queue.Push<WindowResizeEvent>(size);
 		}
 		return 0;
 		case WM_DPICHANGED:
@@ -347,7 +351,6 @@ LRESULT rv::Window::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 		case WM_DESTROY:
 		{
 			this->hwnd = nullptr;
-			PostQuitMessage(0);
 		}
 		return 0;
 	}
