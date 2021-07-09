@@ -192,6 +192,7 @@
     <ClInclude Include="General\Window\Win32Window.h" />
     <ClInclude Include="General\Event.h" />
     <ClInclude Include="General\Window\WindowEvents.h" />
+    <ClInclude Include="Graphics\Buffer.h" />
     <ClInclude Include="Graphics\Command.h" />
     <ClInclude Include="Graphics\DebugMessenger.h" />
     <ClInclude Include="Graphics\Device.h" />
@@ -204,6 +205,8 @@
     <ClInclude Include="Graphics\Pipeline.h" />
     <ClInclude Include="Graphics\FrameBuffer.h" />
     <ClInclude Include="Graphics\Sync.h" />
+    <ClInclude Include="Graphics\Vertex.h" />
+    <ClInclude Include="Graphics\VertexBuffer.h" />
     <ClInclude Include="Utilities\Color.h" />
     <ClInclude Include="Utilities\File.h" />
     <ClInclude Include="Utilities\Typeless.h" />
@@ -229,6 +232,7 @@
     <ClCompile Include="General\Window\source\Win32Window.cpp" />
     <ClCompile Include="General\source\Event.cpp" />
     <ClCompile Include="General\Window\source\WindowEvents.cpp" />
+    <ClCompile Include="Graphics\source\Buffer.cpp" />
     <ClCompile Include="Graphics\source\Frame.cpp" />
     <ClCompile Include="Graphics\source\Command.cpp" />
     <ClCompile Include="Graphics\source\FrameBuffer.cpp" />
@@ -241,6 +245,9 @@
     <ClCompile Include="Graphics\source\Shader.cpp" />
     <ClCompile Include="Graphics\source\Swapchain.cpp" />
     <ClCompile Include="Graphics\source\Sync.cpp" />
+    <ClCompile Include="Graphics\source\VertexBuffer.cpp" />
+    <ClCompile Include="Utilities\OptionalIndex.cpp" />
+    <ClCompile Include="Utilities\source\Assert.cpp" />
     <ClCompile Include="Utilities\source\Exception.cpp" />
     <ClCompile Include="Utilities\source\File.cpp" />
     <ClCompile Include="Utilities\source\hresults.cpp" />

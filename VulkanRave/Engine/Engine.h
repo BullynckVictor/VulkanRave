@@ -22,5 +22,8 @@
 #include "Graphics/Command.h"
 #include "Graphics/Sync.h"
 #include "Graphics/Frame.h"
+#include "Graphics/Vertex.h"
+#include "Graphics/Buffer.h"
+#include "Graphics/VertexBuffer.h"
 
 using namespace std::chrono_literals;

@@ -111,6 +111,11 @@ void rv::CommandBuffer::BindPipeline(Pipeline& pipeline, PipelineType type)
 	vkCmdBindPipeline(buffer, bind, pipeline.pipeline);
 }
 
+void rv::CommandBuffer::BindVertexBuffer(VertexBuffer& vertices, u64 offset)
+{
+	vkCmdBindVertexBuffers(buffer, 0, 1, &vertices.buffer, &offset);
+}
+
 void rv::CommandBuffer::Draw(u32 nVertices, u32 nInstances, u32 vertexOffset, u32 instanceOffset)
 {
 	vkCmdDraw(buffer, nVertices, nInstances, vertexOffset, instanceOffset);

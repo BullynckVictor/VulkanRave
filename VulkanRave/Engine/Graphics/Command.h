@@ -4,6 +4,7 @@
 #include "Graphics/FrameBuffer.h"
 #include "Graphics/Pipeline.h"
 #include "Graphics/Sync.h"
+#include "Graphics/VertexBuffer.h"
 #include "Utilities/Color.h"
 
 namespace rv
@@ -41,6 +42,7 @@ namespace rv
 		void Begin();
 		void BeginPass(RenderPass& pass, FrameBuffer& frameBuffer, const Size& size, std::optional<FColor> color);
 		void BindPipeline(Pipeline& pipeline, PipelineType type = RV_PT_GRAPHICS);
+		void BindVertexBuffer(VertexBuffer& vertices, u64 offset = 0);
 		void Draw(u32 nVertices, u32 nInstances = 1, u32 vertexOffset = 0, u32 instanceOffset = 0);
 		void EndPass();
 		void End();

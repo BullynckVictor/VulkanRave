@@ -2,6 +2,7 @@
 #include "Graphics/Device.h"
 #include "Graphics/Shader.h"
 #include "Graphics/RenderPass.h"
+#include "Graphics/Vertex.h"
 #include "Utilities/Vector.h"
 
 namespace rv
@@ -27,6 +28,17 @@ namespace rv
 		void SetCulling(bool cull);
 		void AddShader(const Shader& shader);
 		void AddDynamicState(const VkDynamicState& state);
+		template<typename V>
+		void SetVertexType()
+		{
+			static constexpr auto bindingDescription = VertexInfo<V>::binding;
+			static constexpr auto attributeDescriptions = VertexInfo<V>::attributes;
+
+			vertexInput.vertexBindingDescriptionCount = 1;
+			vertexInput.vertexAttributeDescriptionCount = static_cast<u32>(attributeDescriptions.size());
+			vertexInput.pVertexBindingDescriptions = &bindingDescription;
+			vertexInput.pVertexAttributeDescriptions = attributeDescriptions.data();
+		}
 
 		VkPipelineVertexInputStateCreateInfo vertexInput{};
 		VkPipelineInputAssemblyStateCreateInfo inputAssembly{};

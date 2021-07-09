@@ -1,5 +1,11 @@
 #include "Engine/Engine.h"
 
+void Log(const std::string& str)
+{
+	OutputDebugString(str.c_str());
+	OutputDebugString("\n");
+}
+
 class TestApp
 {
 public:
@@ -7,8 +13,10 @@ public:
 		:
 		window("Test App", 480, 320, true),
 		listener(window.Listen()),
+#ifdef RV_DEBUG
 		messenger(instance),
 		errorListener(messenger.Listen()),
+#endif
 		surface(window.Surface(instance)),
 		device(instance, rv::GraphicsRequirements(surface.get())),
 		graphicsQueue(device.Queue({ rv::QueueContainsFlag, VK_QUEUE_GRAPHICS_BIT })),
@@ -16,7 +24,12 @@ public:
 		frag(device, "../Engine/Graphics/Shaders/bin/triangle.frag.spv"),
 		vert(device, "../Engine/Graphics/Shaders/bin/triangle.vert.spv"),
 		pool(device, graphicsQueue),
-		frames(2)
+		frames(2),
+		vertices(device, {
+			{{ 0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+			{{ 0.5f,  0.5f}, {0.0f, 1.0f, 0.0f}},
+			{{-0.5f,  0.5f}, {0.0f, 0.0f, 1.0f}}
+		})
 	{
 		for (auto& frame : frames)
 			frame = rv::Frame(device);
@@ -29,9 +42,15 @@ public:
 		rv::uint nFrames = 0;
 		size_t currentFrame = 0;
 
+		float t = 0.0f;
+		std::vector<float> fpses;
+
 		rv::debug.Log(rv::str("init time: ", timer.Mark(), "s"));
+		rv::Timer s{};
 		while (window.HandleMessages())
 		{
+			t += s.Peek();
+			
 			while (auto e = listener.Get())
 				if (auto event = e->opt_cast<rv::WindowResizeEvent>())
 					rv::debug.Log(rv::str("Window resize: (", event->size.width, ", ", event->size.height, ")"));
@@ -46,7 +65,7 @@ public:
 				}
 			}
 #		endif
-
+			
 			if (!window.Minimized())
 			{
 				if (frames[currentFrame].Begin(device, swap, inFlight.data()) && !window.Minimized())
@@ -66,8 +85,15 @@ public:
 
 			currentFrame = (currentFrame + 1) % frames.size();
 			nFrames++;
+			window.SetTitle(rv::str(int(1.0f / s.Peek())));
+			fpses.push_back(1.0f / s.Peek());
+			s.Reset();
 		}
 		rv::debug.Log(rv::str((float)nFrames / timer.Peek(), " fps"));
+	}
+	~TestApp()
+	{
+		vkDeviceWaitIdle(device.device);
 	}
 
 private:
@@ -106,6 +132,7 @@ private:
 		layout.SetBlending(false);
 		layout.SetCulling(true);
 		layout.SetSize(window.GetSize());
+		layout.SetVertexType<rv::ColorVertex2>();
 		layout.Finalize(device);
 		pipeline = rv::Pipeline(device, layout);
 
@@ -118,7 +145,8 @@ private:
 			commandBuffers[i].Begin();
 			commandBuffers[i].BeginPass(layout.pass, frameBuffers[i], window.GetSize(), rv::FColors::LightGray);
 			commandBuffers[i].BindPipeline(pipeline);
-			commandBuffers[i].Draw(3);
+			commandBuffers[i].BindVertexBuffer(vertices);
+			commandBuffers[i].Draw(vertices.size());
 			commandBuffers[i].EndPass();
 			commandBuffers[i].End();
 		}
@@ -146,6 +174,7 @@ private:
 	std::vector<rv::FrameBuffer> frameBuffers;
 	std::vector<rv::Frame> frames;
 	std::vector<VkFence> inFlight;
+	rv::VertexBufferT<rv::ColorVertex2> vertices;
 };
 
 void main()
