@@ -1,5 +1,6 @@
 #pragma once
-#include "Graphics/Device.h"
+#include "Engine/Graphics/Device.h"
+#include "Engine/Resources/BakedResource.h"
 
 namespace rv
 {
@@ -35,6 +36,7 @@ namespace rv
 	{
 		Shader() = default;
 		Shader(Device& device, const char* filename, const ShaderType& type = RV_ST_NULL);
+		Shader(Device& device, const BakedResource resource, const ShaderType& type);
 		Shader(const Shader&) = delete;
 		Shader(Shader&& rhs) noexcept;
 		~Shader();

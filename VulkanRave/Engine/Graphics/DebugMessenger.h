@@ -1,7 +1,7 @@
 #pragma once
-#include "Graphics/Instance.h"
-#include "General/Event.h"
-#include "General/MessageType.h"
+#include "Engine/Graphics/Instance.h"
+#include "Engine/General/Event.h"
+#include "Engine/General/MessageType.h"
 #include <memory>
 
 namespace rv

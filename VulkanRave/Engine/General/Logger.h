@@ -1,8 +1,8 @@
 #pragma once
-#include "General/Event.h"
-#include "General/System.h"
-#include "General/MessageType.h"
-#include "Utilities/String.h"
+#include "Engine/General/Event.h"
+#include "Engine/General/System.h"
+#include "Engine/General/MessageType.h"
+#include "Engine/Utilities/String.h"
 #include <sstream>
 #include <chrono>
 #include <type_traits>

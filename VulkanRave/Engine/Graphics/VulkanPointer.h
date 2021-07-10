@@ -1,7 +1,7 @@
 #pragma once
-#include "Utilities/VulkanPointer.h"
-#include "Graphics/Instance.h"
-#include "Graphics/Device.h"
+#include "Engine/Utilities/VulkanPointer.h"
+#include "Engine/Graphics/Instance.h"
+#include "Engine/Graphics/Device.h"
 
 namespace rv
 {

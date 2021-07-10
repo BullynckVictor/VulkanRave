@@ -1,11 +1,11 @@
 #pragma once
-#include "Graphics/Device.h"
-#include "Graphics/RenderPass.h"
-#include "Graphics/FrameBuffer.h"
-#include "Graphics/Pipeline.h"
-#include "Graphics/Sync.h"
-#include "Graphics/VertexBuffer.h"
-#include "Utilities/Color.h"
+#include "Engine/Graphics/Device.h"
+#include "Engine/Graphics/RenderPass.h"
+#include "Engine/Graphics/FrameBuffer.h"
+#include "Engine/Graphics/Pipeline.h"
+#include "Engine/Graphics/Sync.h"
+#include "Engine/Graphics/VertexBuffer.h"
+#include "Engine/Utilities/Color.h"
 
 namespace rv
 {

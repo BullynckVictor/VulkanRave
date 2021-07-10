@@ -1,9 +1,9 @@
 #pragma once
-#include "Graphics/Device.h"
-#include "Graphics/Shader.h"
-#include "Graphics/RenderPass.h"
-#include "Graphics/Vertex.h"
-#include "Utilities/Vector.h"
+#include "Engine/Graphics/Device.h"
+#include "Engine/Graphics/Shader.h"
+#include "Engine/Graphics/RenderPass.h"
+#include "Engine/Graphics/Vertex.h"
+#include "Engine/Utilities/Vector.h"
 
 namespace rv
 {

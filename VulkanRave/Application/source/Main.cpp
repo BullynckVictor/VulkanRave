@@ -1,10 +1,6 @@
 #include "Engine/Engine.h"
-
-void Log(const std::string& str)
-{
-	OutputDebugString(str.c_str());
-	OutputDebugString("\n");
-}
+#include "Engine/Resources/triangle.frag.spv.h"
+#include "Engine/Resources/triangle.vert.spv.h"
 
 class TestApp
 {
@@ -21,8 +17,8 @@ public:
 		device(instance, rv::GraphicsRequirements(surface.get())),
 		graphicsQueue(device.Queue({ rv::QueueContainsFlag, VK_QUEUE_GRAPHICS_BIT })),
 		presentQueue(device.Queue({ rv::QueueCanPresent, surface.get() })),
-		frag(device, "../Engine/Graphics/Shaders/bin/triangle.frag.spv"),
-		vert(device, "../Engine/Graphics/Shaders/bin/triangle.vert.spv"),
+		frag(device, rv::Resources::triangle_frag_spv, rv::RV_ST_FRAGMENT),
+		vert(device, rv::Resources::triangle_vert_spv, rv::RV_ST_VERTEX),
 		pool(device, graphicsQueue),
 		frames(2),
 		vertices(device, {

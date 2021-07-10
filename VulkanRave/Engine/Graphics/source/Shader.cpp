@@ -1,7 +1,7 @@
-#include "Graphics/Shader.h"
-#include "Graphics/VulkanPointer.h"
-#include "Utilities/Exception.h"
-#include "Utilities/File.h"
+#include "Engine/Graphics/Shader.h"
+#include "Engine/Graphics/VulkanPointer.h"
+#include "Engine/Utilities/Exception.h"
+#include "Engine/Utilities/File.h"
 #include <algorithm>
 
 template<>
@@ -31,6 +31,17 @@ rv::Shader::Shader(Device& device, const char* filename, const ShaderType& type)
 	createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 	createInfo.codeSize = code.size();
 	createInfo.pCode = reinterpret_cast<const uint32*>(code.data());
+	rv_check_vkr(vkCreateShaderModule(device.device, &createInfo, nullptr, &shader));
+}
+
+rv::Shader::Shader(Device& device, const BakedResource resource, const ShaderType& type)
+	:
+	type(type)
+{
+	VkShaderModuleCreateInfo createInfo{};
+	createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+	createInfo.codeSize = resource.size;
+	createInfo.pCode = resource.as<const u32[]>();
 	rv_check_vkr(vkCreateShaderModule(device.device, &createInfo, nullptr, &shader));
 }
 
