@@ -1,27 +1,21 @@
 #include "Engine/Graphics/VertexBuffer.h"
 #include "Engine/Graphics/VulkanPointer.h"
 
-rv::VertexBuffer::VertexBuffer(Device& device, u32 size, const void* vertices)
+rv::VertexBuffer::VertexBuffer(Device& device, ResourceAllocator& allocator, u32 size, const void* vertices, bool staged)
 	:
-	Buffer(device, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, size, vertices)
+	OptimalBuffer(device, allocator, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, size, vertices, staged)
 {
 }
 
 rv::VertexBuffer::VertexBuffer(VertexBuffer&& rhs) noexcept
 	:
-	Buffer(std::move(rhs))
+	OptimalBuffer(std::move(rhs))
 {
 }
 
 rv::VertexBuffer& rv::VertexBuffer::operator=(VertexBuffer&& rhs) noexcept
 {
 	Release(); 
-	buffer = move(buffer); 
-	memory = move(rhs.memory);
+	detail::move_buffers(*this, rhs);
 	return *this;
-}
-
-void rv::detail::move_buffers(Buffer& a, Buffer& b)
-{
-	a = std::move(b);
 }

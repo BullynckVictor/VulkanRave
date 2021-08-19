@@ -91,6 +91,19 @@ rv::DeviceQueue rv::Device::Queue(QueueChecker checker, const uint32 index) cons
 	return queue;
 }
 
+rv::DeviceQueue rv::Device::GetQueue(const char* key) const
+{
+    return queues.at(key);
+}
+
+rv::DeviceQueue rv::Device::StoreQueue(const char* key, QueueChecker checker, const uint32 index)
+{
+	auto it = queues.find(key);
+	if (it == queues.end())
+		return queues[key] = Queue(checker, index);
+	else return it->second;
+}
+
 std::vector<rv::PhysicalDevice> rv::Device::PhysicalDevices(Instance& instance)
 {
 	u32 size = 0;

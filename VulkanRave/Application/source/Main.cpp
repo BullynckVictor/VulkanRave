@@ -15,13 +15,14 @@ public:
 #endif
 		surface(window.Surface(instance)),
 		device(instance, rv::GraphicsRequirements(surface.get())),
-		graphicsQueue(device.Queue({ rv::QueueContainsFlag, VK_QUEUE_GRAPHICS_BIT })),
-		presentQueue(device.Queue({ rv::QueueCanPresent, surface.get() })),
+		graphicsQueue(device.StoreQueue("graphics", { rv::QueueContainsFlag, VK_QUEUE_GRAPHICS_BIT })),
+		presentQueue(device.StoreQueue("present", { rv::QueueCanPresent, surface.get() })),
+		allocator(instance, device, graphicsQueue),
 		frag(device, rv::Resources::triangle_frag_spv, rv::RV_ST_FRAGMENT),
 		vert(device, rv::Resources::triangle_vert_spv, rv::RV_ST_VERTEX),
 		pool(device, graphicsQueue),
 		frames(2),
-		vertices(device, {
+		vertices(device, allocator, {
 			{{ 0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
 			{{ 0.5f,  0.5f}, {0.0f, 1.0f, 0.0f}},
 			{{-0.5f,  0.5f}, {0.0f, 0.0f, 1.0f}}
@@ -44,9 +45,7 @@ public:
 		rv::debug.Log(rv::str("init time: ", timer.Mark(), "s"));
 		rv::Timer s{};
 		while (window.HandleMessages())
-		{
-			t += s.Peek();
-			
+		{			
 			while (auto e = listener.Get())
 				if (auto event = e->opt_cast<rv::WindowResizeEvent>())
 					rv::debug.Log(rv::str("Window resize: (", event->size.width, ", ", event->size.height, ")"));
@@ -79,10 +78,15 @@ public:
 				}
 			}
 
+			vertices[0].color.r = (sinf(t) + 1.0f) / 2.0f;
+			vertices[0].pos.x = (sinf(t) + 1.0f) / 2.0f;
+			vertices.Stage(device, allocator);
+
 			currentFrame = (currentFrame + 1) % frames.size();
 			nFrames++;
 			window.SetTitle(rv::str(int(1.0f / s.Peek())));
 			fpses.push_back(1.0f / s.Peek());
+			t += s.Peek();
 			s.Reset();
 		}
 		rv::debug.Log(rv::str((float)nFrames / timer.Peek(), " fps"));
@@ -120,7 +124,7 @@ private:
 
 		rv::RenderPassDescriptor pass;
 		pass.CreateSubpass();
-		pass.subpasses[0].AddColor(rv::attachments::Color(swap.format.format));
+		pass.subpasses[0].AddColor(rv::attachments::Clear(swap.format.format));
 		pass.dependencies.push_back(rv::dependencies::Color(0));
 		layout.pass = rv::RenderPass(device, pass);
 		layout.AddShader(frag);
@@ -160,6 +164,7 @@ private:
 	rv::Device device;
 	rv::DeviceQueue graphicsQueue;
 	rv::DeviceQueue presentQueue;
+	rv::ResourceAllocator allocator;
 	rv::Shader frag;
 	rv::Shader vert;
 	rv::SwapChain swap;

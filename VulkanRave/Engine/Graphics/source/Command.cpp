@@ -1,6 +1,7 @@
 #include "Engine/Graphics/Command.h"
 #include "Engine/Graphics/VulkanPointer.h"
 #include "Engine/Utilities/Exception.h"
+#include "..\CommandBuffer.h"
 
 template<>
 void rv::destroy(VkCommandPool pool)
@@ -131,6 +132,15 @@ void rv::CommandBuffer::End()
 	rv_check_vkr(vkEndCommandBuffer(buffer));
 }
 
+void rv::CommandBuffer::CopyBuffers(Buffer& source, Buffer& dest, u64 size)
+{
+	VkBufferCopy copyRegion{};
+	copyRegion.size = size;
+	copyRegion.srcOffset = source.memory.Info().offset;
+	copyRegion.dstOffset = dest.memory.Info().offset;
+	vkCmdCopyBuffer(buffer, source.buffer, dest.buffer, 1, &copyRegion);
+}
+
 void rv::CommandBuffer::Submit(
 	DeviceQueue& queue, 
 	const VkSemaphore* wait, 
@@ -151,4 +161,13 @@ void rv::CommandBuffer::Submit(
 	submitInfo.signalSemaphoreCount = nSignals;
 	submitInfo.pSignalSemaphores = signals;
 	rv_check_vkr(vkQueueSubmit(queue.queue, 1, &submitInfo, fence ? fence->fence : VK_NULL_HANDLE));
+}
+
+void rv::CommandBuffer::Submit(DeviceQueue& queue)
+{
+	VkSubmitInfo submitInfo{};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &buffer;
+	rv_check_vkr(vkQueueSubmit(queue.queue, 1, &submitInfo, VK_NULL_HANDLE));
 }

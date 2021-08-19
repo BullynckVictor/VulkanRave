@@ -2,6 +2,7 @@
 #include "Engine/Graphics/Instance.h"
 #include "Engine/Utilities/OptionalIndex.h"
 #include "Engine/Utilities/TypeLess.h"
+#include "Engine/Utilities/Map.h"
 #include <vector>
 
 namespace rv
@@ -66,12 +67,15 @@ namespace rv
 		Device& operator= (Device&& rhs) noexcept;
 
 		DeviceQueue Queue(QueueChecker checker, const uint32 index = 0) const;
+		DeviceQueue GetQueue(const char* key) const;
+		DeviceQueue StoreQueue(const char* key, QueueChecker checker, const uint32 index = 0);
 
 		static std::vector<PhysicalDevice> PhysicalDevices(Instance& instance);
 		void Release();
 
 		VkDevice device = VK_NULL_HANDLE;
 		PhysicalDevice physicalDevice;
+		strmap<DeviceQueue> queues;
 	};
 
 	extern Device* static_device;

@@ -28,6 +28,7 @@ namespace rv
 
 		VkInstance instance = VK_NULL_HANDLE;
 		std::vector<const char*> validation;
+		AppInfo app;
 	};
 
 	extern Instance* static_instance;

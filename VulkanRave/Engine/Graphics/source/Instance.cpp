@@ -37,7 +37,8 @@ rv::AppInfo::AppInfo(const char* name, uint32 version)
 
 rv::Instance::Instance(const AppInfo& app)
 	:
-	validation(app.layers)
+	validation(app.layers),
+	app(app)
 {
 	VkInstanceCreateInfo createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -82,7 +83,8 @@ rv::Instance::Instance(const AppInfo& app)
 rv::Instance::Instance(Instance&& rhs) noexcept
 	:
 	instance(move(rhs.instance)),
-	validation(std::move(rhs.validation))
+	validation(std::move(rhs.validation)),
+	app(std::move(rhs.app))
 {
 }
 
@@ -96,6 +98,7 @@ rv::Instance& rv::Instance::operator=(Instance&& rhs) noexcept
 	Release();
 	instance = move(rhs.instance);
 	validation = std::move(rhs.validation);
+	app = std::move(rhs.app);
 	return *this;
 }
 

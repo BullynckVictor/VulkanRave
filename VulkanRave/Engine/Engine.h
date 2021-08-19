@@ -25,6 +25,7 @@
 #include "Engine/Graphics/Vertex.h"
 #include "Engine/Graphics/Buffer.h"
 #include "Engine/Graphics/VertexBuffer.h"
+#include "Engine/Graphics/ResourceAllocator.h"
 
 #include "Engine/Resources/BakedResource.h"
 

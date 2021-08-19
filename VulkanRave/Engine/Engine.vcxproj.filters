@@ -126,7 +126,7 @@
     <ClInclude Include="Graphics\FrameBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\Command.h">
+    <ClInclude Include="Graphics\CommandBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Utilities\Color.h">
@@ -154,6 +154,30 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Resources\triangle.vert.spv.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\MemoryAllocator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\VulkanMemoryAllocator\vk_mem_alloc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Allocation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\ResourceAllocator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\CommandPool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Command.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\Map.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\OptimalBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -236,9 +260,6 @@
     <ClCompile Include="Utilities\source\Assert.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Utilities\OptionalIndex.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Graphics\source\VertexBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -246,6 +267,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Resources\source\triangle.vert.spv.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\source\MemoryAllocator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\source\Allocation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\source\ResourceAllocator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\source\OptimalBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
