@@ -50,7 +50,7 @@ public:
 		{			
 			while (auto e = listener.Get())
 				if (auto event = e->opt_cast<rv::WindowResizeEvent>())
-					rv::debug.Log(rv::str("Window resize: (", event->size.width, ", ", event->size.height, ")"));
+					rv::debug.Log(rv::str("Window resize: (", event->size.x, ", ", event->size.y, ")"));
 #		ifdef RV_DEBUG
 			while (auto e = errorListener.Get())
 			{

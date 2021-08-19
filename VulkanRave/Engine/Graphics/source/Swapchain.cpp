@@ -71,7 +71,7 @@ rv::SwapChain::SwapChain(Device& device, VkSurfaceKHR surface, const SwapChainSe
 	{
 		debug.Log(str(
 			"extent\n"
-			"window:  (", windowSize.width, ", ", windowSize.height, ")\n"
+			"window:  (", windowSize.x, ", ", windowSize.y, ")\n"
 			"current: (", support.capabilities.currentExtent.width, ", ", support.capabilities.currentExtent.height, ")\n"
 			"min:     (", support.capabilities.minImageExtent.width, ", ", support.capabilities.minImageExtent.height, ")\n"
 			"max:     (", support.capabilities.minImageExtent.width, ", ", support.capabilities.minImageExtent.height, ")\n"
@@ -80,8 +80,8 @@ rv::SwapChain::SwapChain(Device& device, VkSurfaceKHR surface, const SwapChainSe
 			extent = support.capabilities.currentExtent;
 		else
 		{
-			extent.width = std::clamp(windowSize.width, support.capabilities.minImageExtent.width, support.capabilities.maxImageExtent.width);
-			extent.height = std::clamp(windowSize.height, support.capabilities.minImageExtent.height, support.capabilities.maxImageExtent.height);
+			extent.width = std::clamp(windowSize.x, support.capabilities.minImageExtent.width, support.capabilities.maxImageExtent.width);
+			extent.height = std::clamp(windowSize.y, support.capabilities.minImageExtent.height, support.capabilities.maxImageExtent.height);
 		}
 	}
 

@@ -162,9 +162,9 @@ void rv::PipelineLayout::Clear()
 
 void rv::PipelineLayout::SetSize(const Size& size)
 {
-	viewport.width = (float)size.width;
-	viewport.height = (float)size.height;
-	scissor.extent = { size.width, size.height };
+	viewport.width = (float)size.x;
+	viewport.height = (float)size.y;
+	scissor.extent = { size.x, size.y };
 }
 
 void rv::PipelineLayout::SetTopology(const VkPrimitiveTopology& topology)

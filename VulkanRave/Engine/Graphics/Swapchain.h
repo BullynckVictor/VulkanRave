@@ -31,7 +31,7 @@ namespace rv
 	struct SwapChain
 	{
 		SwapChain() = default;
-		SwapChain(Device& device, VkSurfaceKHR surface, const SwapChainSettings& settings = {}, const Size& windowSize = 0);
+		SwapChain(Device& device, VkSurfaceKHR surface, const SwapChainSettings& settings = {}, const Size& windowSize = { 0, 0 });
 		SwapChain(const SwapChain&) = delete;
 		SwapChain(SwapChain&& rhs) noexcept;
 		~SwapChain();

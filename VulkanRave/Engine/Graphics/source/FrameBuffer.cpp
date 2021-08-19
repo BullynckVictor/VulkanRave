@@ -16,8 +16,8 @@ rv::FrameBuffer::FrameBuffer(Device& device, RenderPass& pass, const ImageView& 
 	createInfo.renderPass = pass.pass;
 	createInfo.attachmentCount = 1;
 	createInfo.pAttachments = &view.view;
-	createInfo.width = size.width;
-	createInfo.height = size.height;
+	createInfo.width = size.x;
+	createInfo.height = size.y;
 	createInfo.layers = 1;
 	rv_check_vkr(vkCreateFramebuffer(device.device, &createInfo, nullptr, &frameBuffer));
 }

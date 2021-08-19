@@ -96,7 +96,7 @@ void rv::CommandBuffer::BeginPass(RenderPass& pass, FrameBuffer& frameBuffer, co
 	renderPassInfo.renderPass = pass.pass;
 	renderPassInfo.framebuffer = frameBuffer.frameBuffer;
 	renderPassInfo.renderArea.offset = { 0, 0 };
-	renderPassInfo.renderArea.extent = { size.width, size.height };
+	renderPassInfo.renderArea.extent = { size.x, size.y };
 	renderPassInfo.clearValueCount = 1;
 	renderPassInfo.pClearValues = color.has_value() ? reinterpret_cast<const VkClearValue*>(&color.value()) : nullptr;
 	vkCmdBeginRenderPass(buffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
