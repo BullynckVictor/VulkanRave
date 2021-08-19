@@ -1,6 +1,6 @@
 #include "Engine/Graphics/OptimalBuffer.h"
 
-rv::OptimalBuffer::OptimalBuffer(Device& device, ResourceAllocator& allocator, VkBufferUsageFlags usage, u32 size, const void* source, bool staged)
+rv::OptimalBuffer::OptimalBuffer(Device& device, ResourceAllocator& allocator, VkBufferUsageFlags usage, u64 size, const void* source, bool staged)
 	:
 	Buffer(device, allocator.allocator, usage | (staged ? VK_BUFFER_USAGE_TRANSFER_DST_BIT : 0), staged ? VMA_MEMORY_USAGE_GPU_ONLY : VMA_MEMORY_USAGE_CPU_TO_GPU, size, staged ? nullptr : source)
 {

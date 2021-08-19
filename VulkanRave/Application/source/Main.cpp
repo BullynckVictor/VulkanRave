@@ -23,10 +23,12 @@ public:
 		pool(device, graphicsQueue),
 		frames(2),
 		vertices(device, allocator, {
-			{{ 0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-			{{ 0.5f,  0.5f}, {0.0f, 1.0f, 0.0f}},
-			{{-0.5f,  0.5f}, {0.0f, 0.0f, 1.0f}}
-		})
+			{{ -0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f }},
+			{{  0.5f, -0.5f }, { 0.0f, 1.0f, 0.0f }},
+			{{  0.5f,  0.5f }, { 0.0f, 0.0f, 1.0f }},
+			{{ -0.5f,  0.5f }, { 1.0f, 1.0f, 1.0f }}
+		}),
+		indices(device, allocator, { 0, 1, 2, 2, 3, 0 })
 	{
 		for (auto& frame : frames)
 			frame = rv::Frame(device);
@@ -77,10 +79,6 @@ public:
 					continue;
 				}
 			}
-
-			vertices[0].color.r = (sinf(t) + 1.0f) / 2.0f;
-			vertices[0].pos.x = (sinf(t) + 1.0f) / 2.0f;
-			vertices.Stage(device, allocator);
 
 			currentFrame = (currentFrame + 1) % frames.size();
 			nFrames++;
@@ -143,10 +141,11 @@ private:
 		for (auto i : rv::range(commandBuffers))
 		{
 			commandBuffers[i].Begin();
-			commandBuffers[i].BeginPass(layout.pass, frameBuffers[i], window.GetSize(), rv::FColors::LightGray);
+			commandBuffers[i].BeginPass(layout.pass, frameBuffers[i], window.GetSize(), rv::FColors::Black);
 			commandBuffers[i].BindPipeline(pipeline);
 			commandBuffers[i].BindVertexBuffer(vertices);
-			commandBuffers[i].Draw(vertices.size());
+			commandBuffers[i].BindIndexBuffer(indices);
+			commandBuffers[i].DrawIndexed((rv::u32)indices.size());
 			commandBuffers[i].EndPass();
 			commandBuffers[i].End();
 		}
@@ -176,6 +175,7 @@ private:
 	std::vector<rv::Frame> frames;
 	std::vector<VkFence> inFlight;
 	rv::VertexBufferT<rv::ColorVertex2> vertices;
+	rv::IndexBuffer16 indices;
 };
 
 void main()

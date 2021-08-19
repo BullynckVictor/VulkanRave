@@ -200,6 +200,7 @@
     <ClInclude Include="Graphics\Device.h" />
     <ClInclude Include="Graphics\Frame.h" />
     <ClInclude Include="Graphics\ImageView.h" />
+    <ClInclude Include="Graphics\IndexBuffer.h" />
     <ClInclude Include="Graphics\Instance.h" />
     <ClInclude Include="Graphics\MemoryAllocator.h" />
     <ClInclude Include="Graphics\OptimalBuffer.h" />

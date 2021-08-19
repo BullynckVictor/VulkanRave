@@ -40,8 +40,8 @@ namespace rv
 		void Write(Device& device) { Copy(device, vertices.data(), byte_size()); }
 		void Stage(Device& device, ResourceAllocator& allocator) { VertexBuffer::Stage(device, allocator, vertices.data(), byte_size()); }
 
-		u32 size() const { return (u32)vertices.size(); }
-		u32 byte_size() const { return size() * sizeof(V); }
+		u64 size() const { return (u32)vertices.size(); }
+		u64 byte_size() const { return size() * sizeof(V); }
 
 		std::vector<V> vertices;
 	};

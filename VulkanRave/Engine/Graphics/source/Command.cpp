@@ -117,9 +117,19 @@ void rv::CommandBuffer::BindVertexBuffer(VertexBuffer& vertices, u64 offset)
 	vkCmdBindVertexBuffers(buffer, 0, 1, &vertices.buffer, &offset);
 }
 
+void rv::CommandBuffer::BindIndexBuffer(IndexBuffer& indices, u64 offset)
+{
+	vkCmdBindIndexBuffer(buffer, indices.buffer, offset, indices.type);
+}
+
 void rv::CommandBuffer::Draw(u32 nVertices, u32 nInstances, u32 vertexOffset, u32 instanceOffset)
 {
 	vkCmdDraw(buffer, nVertices, nInstances, vertexOffset, instanceOffset);
+}
+
+void rv::CommandBuffer::DrawIndexed(u32 nIndices, u32 nInstances, u32 indexOffset, u32 vertexOffset, u32 instanceOffset)
+{
+	vkCmdDrawIndexed(buffer, nIndices, nInstances, indexOffset, vertexOffset, instanceOffset);
 }
 
 void rv::CommandBuffer::EndPass()
@@ -136,8 +146,6 @@ void rv::CommandBuffer::CopyBuffers(Buffer& source, Buffer& dest, u64 size)
 {
 	VkBufferCopy copyRegion{};
 	copyRegion.size = size;
-	copyRegion.srcOffset = source.memory.Info().offset;
-	copyRegion.dstOffset = dest.memory.Info().offset;
 	vkCmdCopyBuffer(buffer, source.buffer, dest.buffer, 1, &copyRegion);
 }
 

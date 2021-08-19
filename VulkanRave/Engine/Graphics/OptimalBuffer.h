@@ -11,7 +11,7 @@ namespace rv
 	struct OptimalBuffer : public Buffer
 	{
 		OptimalBuffer() = default;
-		OptimalBuffer(Device& device, ResourceAllocator& allocator, VkBufferUsageFlags usage, u32 size, const void* source = nullptr, bool staged = true);
+		OptimalBuffer(Device& device, ResourceAllocator& allocator, VkBufferUsageFlags usage, u64 size, const void* source = nullptr, bool staged = true);
 		OptimalBuffer(const OptimalBuffer&) = delete;
 		OptimalBuffer(OptimalBuffer&& rhs) noexcept;
 
