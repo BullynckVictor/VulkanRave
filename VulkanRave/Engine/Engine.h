@@ -4,6 +4,7 @@
 #include "Engine/General/Event.h"
 #include "Engine/General/Logger.h"
 #include "Engine/General/Window.h"
+#include "Engine/General/Transform.h"
 
 #include "Engine/Utilities/Exception.h"
 #include "Engine/Utilities/String.h"
@@ -26,6 +27,7 @@
 #include "Engine/Graphics/Buffer.h"
 #include "Engine/Graphics/VertexBuffer.h"
 #include "Engine/Graphics/IndexBuffer.h"
+#include "Engine/Graphics/UniformBuffer.h"
 #include "Engine/Graphics/ResourceAllocator.h"
 
 #include "Engine/Resources/BakedResource.h"

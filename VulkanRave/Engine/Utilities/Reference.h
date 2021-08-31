@@ -27,11 +27,14 @@ namespace rv
 
 		void assert()	{ detail::assert_ptr(ref); }
 
-		operator T& ()	{ assert(); return *ref; }
-		T& get()		{ assert(); return *ref; }
+		operator T& ()		{ assert(); return *ref; }
+		T& get()			{ assert(); return *ref; }
+		T* operator-> ()	{ assert(); return  ref; }
 
-		operator const T& () const	{ assert(); return *ref; }
-		const T& get() const		{ assert(); return *ref; }
+		operator const T& () const		{ assert(); return *ref; }
+		const T& get() const			{ assert(); return *ref; }
+		const T* operator-> () const	{ assert(); return  ref; }
+
 
 	private:
 		T* ref = nullptr;

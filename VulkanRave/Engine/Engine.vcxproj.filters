@@ -1047,6 +1047,15 @@
     <ClInclude Include="Utilities\GLM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="General\Transform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\DescriptorSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\UniformBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Utilities\source\Exception.cpp">
@@ -1149,6 +1158,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Libraries\glm\detail\glm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="General\source\Transform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\source\UniformBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\source\DescriptorSet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

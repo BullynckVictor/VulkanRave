@@ -3,6 +3,7 @@
 #include "Engine/Graphics/Shader.h"
 #include "Engine/Graphics/RenderPass.h"
 #include "Engine/Graphics/Vertex.h"
+#include "Engine/Graphics/DescriptorSet.h"
 #include "Engine/Utilities/Vector.h"
 
 namespace rv
@@ -54,6 +55,7 @@ namespace rv
 		VkPipelineDynamicStateCreateInfo dynamicState{};
 		std::vector<VkDynamicState> dynamicStates;
 		RenderPass pass;
+		DescriptorSetLayout descriptorSet;
 
 		VkPipelineLayout layout = VK_NULL_HANDLE;
 	};

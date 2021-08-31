@@ -6,6 +6,7 @@
 #include "Engine/Graphics/Sync.h"
 #include "Engine/Graphics/VertexBuffer.h"
 #include "Engine/Graphics/IndexBuffer.h"
+#include "Engine/Graphics/DescriptorSet.h"
 #include "Engine/Utilities/Color.h"
 
 namespace rv
@@ -29,6 +30,7 @@ namespace rv
 		void BindPipeline(Pipeline& pipeline, PipelineType type = RV_PT_GRAPHICS);
 		void BindVertexBuffer(VertexBuffer& vertices, u64 offset = 0);
 		void BindIndexBuffer(IndexBuffer& indices, u64 offset = 0);
+		void BindDescriptorSet(PipelineLayout& layout, DescriptorSet& set, PipelineType type = RV_PT_GRAPHICS);
 		void Draw(u32 nVertices, u32 nInstances = 1, u32 vertexOffset = 0, u32 instanceOffset = 0);
 		void DrawIndexed(u32 nIndices, u32 nInstances = 1, u32 indexOffset = 0, u32 vertexOffset = 0, u32 instanceOffset = 0);
 		void EndPass();

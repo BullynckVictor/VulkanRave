@@ -22,13 +22,8 @@ public:
 		vert(device, rv::Resources::triangle_vert_spv, rv::RV_ST_VERTEX),
 		pool(device, graphicsQueue),
 		frames(2),
-		vertices(device, allocator, {
-			{{ -0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f }},
-			{{  0.5f, -0.5f }, { 0.0f, 1.0f, 0.0f }},
-			{{  0.5f,  0.5f }, { 0.0f, 0.0f, 1.0f }},
-			{{ -0.5f,  0.5f }, { 1.0f, 1.0f, 1.0f }}
-		}),
-		indices(device, allocator, { 0, 1, 2, 2, 3, 0 })
+		camera(rv::Vector2{ 0 }, 0, 1, window.GetSize()),
+		triangle(device, allocator, camera)
 	{
 		for (auto& frame : frames)
 			frame = rv::Frame(device);
@@ -47,7 +42,7 @@ public:
 		rv::debug.Log(rv::str("init time: ", timer.Mark(), "s"));
 		rv::Timer s{};
 		while (window.HandleMessages())
-		{			
+		{
 			while (auto e = listener.Get())
 				if (auto event = e->opt_cast<rv::WindowResizeEvent>())
 					rv::debug.Log(rv::str("Window resize: (", event->size.x, ", ", event->size.y, ")"));
@@ -62,6 +57,14 @@ public:
 				}
 			}
 #		endif
+
+			float a = sinf((t + 1.0f) / 2.0f);
+			triangle.color.b = a / 3.0f + 2.0f / 3.0f;
+			triangle.color.g = a / 3.0f + 2.0f / 3.0f * 4;
+			triangle.color.r = 0.0f;
+
+			triangle.colorUniform.Copy(device, &triangle.color, sizeof(rv::FColor));
+			triangle.transformUniform.Copy(device, &triangle.transform.modelview, sizeof(rv::Matrix4));
 			
 			if (!window.Minimized())
 			{
@@ -71,7 +74,7 @@ public:
 					RecreateSwap();
 					continue;
 				}
-				frames[currentFrame].Submit(device, graphicsQueue, commandBuffers[frames[currentFrame].image]);
+				frames[currentFrame].Submit(device, graphicsQueue, triangle.commandBuffers[frames[currentFrame].image]);
 				if (frames[currentFrame].Present(swap, presentQueue) && !window.Minimized())
 				{
 					rv::debug.Log("Resize! (Present)");
@@ -101,53 +104,62 @@ private:
 		vkQueueWaitIdle(presentQueue.queue);
 
 		frameBuffers.clear();
-		pipeline.Release();
-		layout.Release();
-		layout.Clear();
+		triangle.pipeline.Release();
+		triangle.layout.Release();
+		triangle.layout.Clear();
 		swap.Release();
 
 		swap = rv::SwapChain(device, surface.get(), rv::DefaultSwap(true), window.GetSize());
-		if (commandBuffers.size() != swap.images.size())
+		if (triangle.commandBuffers.size() != swap.images.size())
 		{
-			commandBuffers.clear();
-			commandBuffers.resize(swap.images.size());
+			triangle.commandBuffers.clear();
+			triangle.commandBuffers.resize(swap.images.size());
 		}
 		else
 		{
-			for (auto& cmd : commandBuffers)
+			for (auto& cmd : triangle.commandBuffers)
 				cmd.Free(device, pool);
 		}
-		for (auto& cmd : commandBuffers)
+		for (auto& cmd : triangle.commandBuffers)
 			cmd = rv::CommandBuffer(device, pool);
 
 		rv::RenderPassDescriptor pass;
 		pass.CreateSubpass();
 		pass.subpasses[0].AddColor(rv::attachments::Clear(swap.format.format));
 		pass.dependencies.push_back(rv::dependencies::Color(0));
-		layout.pass = rv::RenderPass(device, pass);
-		layout.AddShader(frag);
-		layout.AddShader(vert);
-		layout.SetBlending(false);
-		layout.SetCulling(true);
-		layout.SetSize(window.GetSize());
-		layout.SetVertexType<rv::ColorVertex2>();
-		layout.Finalize(device);
-		pipeline = rv::Pipeline(device, layout);
+		triangle.layout.Release();
+		triangle.layout.pass = rv::RenderPass(device, pass);
+		triangle.layout.AddShader(frag);
+		triangle.layout.AddShader(vert);
+		triangle.layout.SetBlending(false);
+		triangle.layout.SetCulling(false);
+		triangle.layout.SetSize(window.GetSize());
+		triangle.layout.SetVertexType<rv::Vertex2>();
+		triangle.layout.descriptorSet.AddUniformBuffer(rv::RV_ST_VERTEX);
+		triangle.layout.descriptorSet.AddUniformBuffer(rv::RV_ST_FRAGMENT);
+		triangle.layout.Finalize(device);
+		triangle.pipeline = rv::Pipeline(device, triangle.layout);
 
 		frameBuffers.resize(swap.images.size());
 		for (auto i : rv::range(frameBuffers))
-			frameBuffers[i] = rv::FrameBuffer(device, layout.pass, swap.views[i], { swap.extent.width, swap.extent.height });
+			frameBuffers[i] = rv::FrameBuffer(device, triangle.layout.pass, swap.views[i], { swap.extent.width, swap.extent.height });
 
-		for (auto i : rv::range(commandBuffers))
+		descPool = rv::DescriptorPool(device, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 2);
+		triangle.set = rv::DescriptorSet(device, descPool, triangle.layout.descriptorSet);
+		triangle.set.WriteBuffer(device, triangle.transformUniform, sizeof(rv::Matrix4), 0);
+		triangle.set.WriteBuffer(device, triangle.colorUniform, sizeof(rv::FColor), 1);
+
+		for (auto i : rv::range(triangle.commandBuffers))
 		{
-			commandBuffers[i].Begin();
-			commandBuffers[i].BeginPass(layout.pass, frameBuffers[i], window.GetSize(), rv::FColors::Black);
-			commandBuffers[i].BindPipeline(pipeline);
-			commandBuffers[i].BindVertexBuffer(vertices);
-			commandBuffers[i].BindIndexBuffer(indices);
-			commandBuffers[i].DrawIndexed((rv::u32)indices.size());
-			commandBuffers[i].EndPass();
-			commandBuffers[i].End();
+			triangle.commandBuffers[i].Begin();
+			triangle.commandBuffers[i].BeginPass(triangle.layout.pass, frameBuffers[i], window.GetSize(), rv::FColors::Black);
+			triangle.commandBuffers[i].BindPipeline(triangle.pipeline);
+			triangle.commandBuffers[i].BindVertexBuffer(triangle.vertices);
+			triangle.commandBuffers[i].BindIndexBuffer(triangle.indices);
+			triangle.commandBuffers[i].BindDescriptorSet(triangle.layout, triangle.set);
+			triangle.commandBuffers[i].DrawIndexed((rv::u32)triangle.indices.size());
+			triangle.commandBuffers[i].EndPass();
+			triangle.commandBuffers[i].End();
 		}
 	}
 
@@ -167,15 +179,49 @@ private:
 	rv::Shader frag;
 	rv::Shader vert;
 	rv::SwapChain swap;
-	rv::CommandPool pool;
-	std::vector<rv::CommandBuffer> commandBuffers;
-	rv::PipelineLayout layout;
-	rv::Pipeline pipeline;
+	rv::CommandPool pool;	
 	std::vector<rv::FrameBuffer> frameBuffers;
 	std::vector<rv::Frame> frames;
 	std::vector<VkFence> inFlight;
-	rv::VertexBufferT<rv::ColorVertex2> vertices;
-	rv::IndexBuffer16 indices;
+	rv::Camera2 camera{};
+	rv::DescriptorPool descPool = {};
+	
+
+	struct Triangle
+	{
+		Triangle(rv::Device& device, rv::ResourceAllocator& allocator, const rv::Camera2& camera)
+			:
+			vertices(device, allocator, {
+				{{ -0.5f, -0.5f }},
+				{{  0.5f, -0.5f }},
+				{{  0.5f,  0.5f }},
+				{{ -0.5f,  0.5f }}
+			}),
+			indices(device, allocator, { 0, 1, 2, 2, 3, 0 }),
+			transform(camera),
+			colorUniform(device, allocator, color),
+			transformUniform(device, allocator, transform.modelview),
+			color(rv::FColors::White)
+		{
+			for (const auto& vert : vertices.vertices)
+			{
+				rv::Vector4 vec4 = rv::Vector4(vert.pos, rv::Vector2(0.0f, 1.0f));
+				auto result = vec4 * camera.view;
+				result.x += 1.0f;
+			}
+		}
+
+		std::vector<rv::CommandBuffer> commandBuffers;
+		rv::PipelineLayout layout;
+		rv::Pipeline pipeline;
+		rv::Transform2 transform;
+		rv::FColor color;
+		rv::UniformBuffer colorUniform;
+		rv::UniformBuffer transformUniform;
+		rv::VertexBufferT<rv::Vertex2> vertices;
+		rv::IndexBuffer16 indices;
+		rv::DescriptorSet set = {};
+	} triangle;
 };
 
 void main()

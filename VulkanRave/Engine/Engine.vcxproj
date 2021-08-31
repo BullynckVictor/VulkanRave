@@ -186,6 +186,7 @@
     <ClInclude Include="General\MessageType.h" />
     <ClInclude Include="General\System.h" />
     <ClInclude Include="General\SystemInclude.h" />
+    <ClInclude Include="General\Transform.h" />
     <ClInclude Include="General\Window.h" />
     <ClInclude Include="General\Window\Keyboard.h" />
     <ClInclude Include="General\Window\Mouse.h" />
@@ -197,6 +198,7 @@
     <ClInclude Include="Graphics\CommandBuffer.h" />
     <ClInclude Include="Graphics\CommandPool.h" />
     <ClInclude Include="Graphics\DebugMessenger.h" />
+    <ClInclude Include="Graphics\DescriptorSet.h" />
     <ClInclude Include="Graphics\Device.h" />
     <ClInclude Include="Graphics\Frame.h" />
     <ClInclude Include="Graphics\ImageView.h" />
@@ -212,6 +214,7 @@
     <ClInclude Include="Graphics\Pipeline.h" />
     <ClInclude Include="Graphics\FrameBuffer.h" />
     <ClInclude Include="Graphics\Sync.h" />
+    <ClInclude Include="Graphics\UniformBuffer.h" />
     <ClInclude Include="Graphics\Vertex.h" />
     <ClInclude Include="Graphics\VertexBuffer.h" />
     <ClInclude Include="Libraries\glm\common.hpp" />
@@ -527,11 +530,13 @@
   <ItemGroup>
     <ClCompile Include="General\source\Logger.cpp" />
     <ClCompile Include="General\source\Main.cpp" />
+    <ClCompile Include="General\source\Transform.cpp" />
     <ClCompile Include="General\Window\source\Keyboard.cpp" />
     <ClCompile Include="General\Window\source\Mouse.cpp" />
     <ClCompile Include="General\Window\source\Win32Window.cpp" />
     <ClCompile Include="General\source\Event.cpp" />
     <ClCompile Include="General\Window\source\WindowEvents.cpp" />
+    <ClCompile Include="Graphics\source\DescriptorSet.cpp" />
     <ClCompile Include="Graphics\source\OptimalBuffer.cpp" />
     <ClCompile Include="Graphics\source\ResourceAllocator.cpp" />
     <ClCompile Include="Graphics\source\Allocation.cpp" />
@@ -549,6 +554,7 @@
     <ClCompile Include="Graphics\source\Shader.cpp" />
     <ClCompile Include="Graphics\source\Swapchain.cpp" />
     <ClCompile Include="Graphics\source\Sync.cpp" />
+    <ClCompile Include="Graphics\source\UniformBuffer.cpp" />
     <ClCompile Include="Graphics\source\VertexBuffer.cpp" />
     <ClCompile Include="Libraries\glm\detail\glm.cpp" />
     <ClCompile Include="Resources\source\triangle.frag.spv.cpp" />
