@@ -11,6 +11,7 @@
 #include "Engine/Utilities/Timer.h"
 #include "Engine/Utilities/Vector.h"
 #include "Engine/Utilities/Range.h"
+#include "Engine/Utilities/SortedVector.h"
 
 #include "Engine/Graphics/Instance.h"
 #include "Engine/Graphics/DebugMessenger.h"

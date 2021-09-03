@@ -508,10 +508,12 @@
     <ClInclude Include="Resources\triangle.frag.spv.h" />
     <ClInclude Include="Resources\triangle.vert.spv.h" />
     <ClInclude Include="Utilities\Color.h" />
+    <ClInclude Include="Utilities\Entry.h" />
     <ClInclude Include="Utilities\File.h" />
     <ClInclude Include="Utilities\GLM.h" />
     <ClInclude Include="Utilities\Map.h" />
     <ClInclude Include="Utilities\Matrix.h" />
+    <ClInclude Include="Utilities\SortedVector.h" />
     <ClInclude Include="Utilities\Typeless.h" />
     <ClInclude Include="Utilities\OptionalIndex.h" />
     <ClInclude Include="Graphics\Vulkan.h" />

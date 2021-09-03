@@ -3,7 +3,10 @@
 #include "Engine/Graphics/Shader.h"
 #include "Engine/Graphics/UniformBuffer.h"
 #include "Engine/Utilities/Reference.h"
+#include "Engine/Utilities/SortedVector.h"
 #include <list>
+#include <deque>
+#include <map>
 
 namespace rv
 {
@@ -17,7 +20,13 @@ namespace rv
 		DescriptorSetLayout& operator= (const DescriptorSetLayout&) = delete;
 		DescriptorSetLayout& operator= (DescriptorSetLayout&& rhs) noexcept;
 
+		bool operator== (const DescriptorSetLayout& rhs) const;
+		bool operator!= (const DescriptorSetLayout& rhs) const;
+		bool operator<  (const DescriptorSetLayout& rhs) const;
+		bool operator>  (const DescriptorSetLayout& rhs) const;
+
 		void Finalize(Device& device);
+		void Copy(const DescriptorSetLayout& rhs);
 
 		void Release();
 
@@ -25,15 +34,14 @@ namespace rv
 		void AddUniformBuffer(ShaderType shaderStages, u32 count = 1);
 
 		std::vector<VkDescriptorSetLayoutBinding> bindings;
-//		std::map<VkDescriptorType, u32> bindingCount;
 		VkDescriptorSetLayout layout = VK_NULL_HANDLE;
 	};
 
 	struct DescriptorPool
 	{
 		DescriptorPool() = default;
-		DescriptorPool(Device& device, VkDescriptorType type, u32 size, bool freeIndividual = true);
-		DescriptorPool(Device& device, const std::vector<VkDescriptorPoolSize>& sizes, bool freeIndividual = true);
+		DescriptorPool(Device& device, VkDescriptorType type, u32 descriptors, u32 sets, bool freeIndividual = true);
+		DescriptorPool(Device& device, const std::vector<VkDescriptorPoolSize>& sizes, u32 sets, bool freeIndividual = true);
 		DescriptorPool(const DescriptorPool&) = delete;
 		DescriptorPool(DescriptorPool&& rhs) noexcept;
 		~DescriptorPool();
@@ -64,7 +72,7 @@ namespace rv
 		VkDescriptorSet set = VK_NULL_HANDLE;
 	};
 
-	class DescriptorSetAllocator;
+	class DescriptorPoolPool;
 
 	struct DescriptorSetHandle
 	{
@@ -79,13 +87,15 @@ namespace rv
 		void Release();
 
 		DescriptorSet set {};
-		OptionalReference<DescriptorSetAllocator> allocator{};
+		OptionalReference<DescriptorPoolPool> allocator{};
 	};
 
-	class DescriptorSetAllocator
+	class DescriptorPoolPool
 	{
 	public:
-		DescriptorSetHandle CreateSet(Device& device, const DescriptorSetLayout& layout);
+		DescriptorPoolPool() = default;
+		DescriptorPoolPool(const DescriptorSetLayout& layout);
+		DescriptorSetHandle CreateSet(Device& device);
 
 	private:
 		void Release(DescriptorSetHandle& handle);
@@ -99,12 +109,23 @@ namespace rv
 			Pool& operator= (const Pool&) = delete;
 			Pool& operator= (Pool&& rhs) noexcept;
 
-			u32 size = 0;
-			u32 filled = 0;
+			u32 left = 0;
 			DescriptorPool pool = {};
 		};
-		std::vector<Pool> pools;
+		std::deque<Pool> pools;
+		std::list<DescriptorSet> freeSets;
+		OptionalReference<const DescriptorSetLayout> layout;
+		std::vector<VkDescriptorPoolSize> sizes;
 
 		friend struct DescriptorSetHandle;
+	};
+
+	class DescriptorSetAllocator
+	{
+	public:
+		DescriptorSetHandle CreateSet(Device& device, const DescriptorSetLayout& layout);
+
+	private:
+		std::map<DescriptorSetLayout, DescriptorPoolPool> pools;
 	};
 }

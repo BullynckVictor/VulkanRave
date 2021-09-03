@@ -144,10 +144,9 @@ private:
 		for (auto i : rv::range(frameBuffers))
 			frameBuffers[i] = rv::FrameBuffer(device, triangle.layout.pass, swap.views[i], { swap.extent.width, swap.extent.height });
 
-		descPool = rv::DescriptorPool(device, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 2);
-		triangle.set = rv::DescriptorSet(device, descPool, triangle.layout.descriptorSet);
-		triangle.set.WriteBuffer(device, triangle.transformUniform, sizeof(rv::Matrix4), 0);
-		triangle.set.WriteBuffer(device, triangle.colorUniform, sizeof(rv::FColor), 1);
+		triangle.set = setAllocator.CreateSet(device, triangle.layout.descriptorSet);
+		triangle.set.set.WriteBuffer(device, triangle.transformUniform, sizeof(rv::Matrix4), 0);
+		triangle.set.set.WriteBuffer(device, triangle.colorUniform, sizeof(rv::FColor), 1);
 
 		for (auto i : rv::range(triangle.commandBuffers))
 		{
@@ -156,7 +155,7 @@ private:
 			triangle.commandBuffers[i].BindPipeline(triangle.pipeline);
 			triangle.commandBuffers[i].BindVertexBuffer(triangle.vertices);
 			triangle.commandBuffers[i].BindIndexBuffer(triangle.indices);
-			triangle.commandBuffers[i].BindDescriptorSet(triangle.layout, triangle.set);
+			triangle.commandBuffers[i].BindDescriptorSet(triangle.layout, triangle.set.set);
 			triangle.commandBuffers[i].DrawIndexed((rv::u32)triangle.indices.size());
 			triangle.commandBuffers[i].EndPass();
 			triangle.commandBuffers[i].End();
@@ -179,12 +178,12 @@ private:
 	rv::Shader frag;
 	rv::Shader vert;
 	rv::SwapChain swap;
-	rv::CommandPool pool;	
+	rv::CommandPool pool;
 	std::vector<rv::FrameBuffer> frameBuffers;
 	std::vector<rv::Frame> frames;
 	std::vector<VkFence> inFlight;
 	rv::Camera2 camera{};
-	rv::DescriptorPool descPool = {};
+	rv::DescriptorSetAllocator setAllocator;
 	
 
 	struct Triangle
@@ -203,12 +202,6 @@ private:
 			transformUniform(device, allocator, transform.modelview),
 			color(rv::FColors::White)
 		{
-			for (const auto& vert : vertices.vertices)
-			{
-				rv::Vector4 vec4 = rv::Vector4(vert.pos, rv::Vector2(0.0f, 1.0f));
-				auto result = vec4 * camera.view;
-				result.x += 1.0f;
-			}
 		}
 
 		std::vector<rv::CommandBuffer> commandBuffers;
@@ -220,7 +213,7 @@ private:
 		rv::UniformBuffer transformUniform;
 		rv::VertexBufferT<rv::Vertex2> vertices;
 		rv::IndexBuffer16 indices;
-		rv::DescriptorSet set = {};
+		rv::DescriptorSetHandle set = {};
 	} triangle;
 };
 

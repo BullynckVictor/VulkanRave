@@ -1,6 +1,7 @@
 #include "Engine/Graphics/DescriptorSet.h"
 #include "Engine/Graphics/VulkanPointer.h"
 #include "Engine/Utilities/Exception.h"
+#include "Engine/Utilities/Range.h"
 
 template<>
 void rv::destroy(VkDescriptorSetLayout layout)
@@ -34,6 +35,34 @@ rv::DescriptorSetLayout& rv::DescriptorSetLayout::operator=(DescriptorSetLayout&
 	return *this;
 }
 
+int comp(const std::vector<VkDescriptorSetLayoutBinding>& a, const std::vector<VkDescriptorSetLayoutBinding>& b)
+{
+	for (const size_t i : rv::range(a))
+		if (int c = memcmp(&a[i], &b[i], sizeof(a)))
+			return c;
+	return 0;
+}
+
+bool rv::DescriptorSetLayout::operator==(const DescriptorSetLayout& rhs) const
+{
+	return !comp(bindings, rhs.bindings);
+}
+
+bool rv::DescriptorSetLayout::operator!=(const DescriptorSetLayout& rhs) const
+{
+	return comp(bindings, rhs.bindings);
+}
+
+bool rv::DescriptorSetLayout::operator<(const DescriptorSetLayout& rhs) const
+{
+	return comp(bindings, rhs.bindings) < 0;
+}
+
+bool rv::DescriptorSetLayout::operator>(const DescriptorSetLayout& rhs) const
+{
+	return comp(bindings, rhs.bindings) > 0;
+}
+
 void rv::DescriptorSetLayout::Finalize(Device& device)
 {
 	VkDescriptorSetLayoutCreateInfo layoutInfo{};
@@ -41,6 +70,12 @@ void rv::DescriptorSetLayout::Finalize(Device& device)
 	layoutInfo.bindingCount = (u32)bindings.size();
 	layoutInfo.pBindings = bindings.data();
 	rv_check_vkr(vkCreateDescriptorSetLayout(device.device, &layoutInfo, nullptr, &layout));
+}
+
+void rv::DescriptorSetLayout::Copy(const DescriptorSetLayout& rhs)
+{
+	Release();
+	bindings = rhs.bindings;
 }
 
 void rv::DescriptorSetLayout::Release()
@@ -51,7 +86,6 @@ void rv::DescriptorSetLayout::Release()
 
 void rv::DescriptorSetLayout::AddBinding(VkDescriptorSetLayoutBinding binding)
 {
-//	binding.binding = bindingCount[binding.descriptorType]++;
 	binding.binding = (u32)bindings.size();
 	bindings.push_back(binding);
 }
@@ -59,7 +93,6 @@ void rv::DescriptorSetLayout::AddBinding(VkDescriptorSetLayoutBinding binding)
 void rv::DescriptorSetLayout::AddUniformBuffer(ShaderType shaderStages, u32 count)
 {
 	VkDescriptorSetLayoutBinding binding{};
-//	binding.binding = bindingCount[binding.descriptorType]++;
 	binding.binding = (u32)bindings.size();
 	binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 	binding.descriptorCount = count;
@@ -67,31 +100,29 @@ void rv::DescriptorSetLayout::AddUniformBuffer(ShaderType shaderStages, u32 coun
 	bindings.push_back(binding);
 }
 
-rv::DescriptorPool::DescriptorPool(Device& device, VkDescriptorType type, u32 size, bool freeIndividual)
+rv::DescriptorPool::DescriptorPool(Device& device, VkDescriptorType type, u32 descriptors, u32 sets, bool freeIndividual)
 {
 	VkDescriptorPoolSize poolSize{};
 	poolSize.type = type;
-	poolSize.descriptorCount = size;
+	poolSize.descriptorCount = descriptors * sets;
 	VkDescriptorPoolCreateInfo poolInfo{};
 	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 	poolInfo.poolSizeCount = 1;
 	poolInfo.pPoolSizes = &poolSize;
-	poolInfo.maxSets = size;
+	poolInfo.maxSets = sets;
 	poolInfo.flags = freeIndividual ? VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT : 0;
 
 	rv_check_vkr(vkCreateDescriptorPool(device.device, &poolInfo, nullptr, &pool));
 }
 
-rv::DescriptorPool::DescriptorPool(Device& device, const std::vector<VkDescriptorPoolSize>& sizes, bool freeIndividual)
+rv::DescriptorPool::DescriptorPool(Device& device, const std::vector<VkDescriptorPoolSize>& sizes, u32 sets, bool freeIndividual)
 {
 	VkDescriptorPoolCreateInfo poolInfo{};
 	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 	poolInfo.poolSizeCount = (u32)sizes.size();
 	poolInfo.pPoolSizes = sizes.data();
-	poolInfo.maxSets = 0;
+	poolInfo.maxSets = sets;
 	poolInfo.flags = freeIndividual ? VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT : 0;
-	for (const auto& size : sizes)
-		poolInfo.maxSets += size.descriptorCount;
 
 	rv_check_vkr(vkCreateDescriptorPool(device.device, &poolInfo, nullptr, &pool));
 }
@@ -193,50 +224,81 @@ rv::DescriptorSetHandle& rv::DescriptorSetHandle::operator=(DescriptorSetHandle&
 
 void rv::DescriptorSetHandle::Release()
 {
-	allocator->Release(*this);
+	if (allocator.valid())
+		allocator->Release(*this);
 }
 
-rv::DescriptorSetHandle rv::DescriptorSetAllocator::CreateSet(Device& device, const DescriptorSetLayout& layout)
+rv::DescriptorPoolPool::DescriptorPoolPool(const DescriptorSetLayout& layout)
+	:
+	layout(layout)
 {
-	DescriptorSetHandle handle {};
+	for (const auto& binding : layout.bindings)
+	{
+		VkDescriptorPoolSize size{};
+		size.type = binding.descriptorType;
+		size.descriptorCount = binding.descriptorCount;
+		sizes.push_back(size);
+	}
+}
+
+rv::DescriptorSetHandle rv::DescriptorPoolPool::CreateSet(Device& device)
+{
+	DescriptorSetHandle handle{};
 	handle.allocator = *this;
 
-	if (pools.empty())
-	{
-		Pool pool{};
-		std::vector<VkDescriptorPoolSize> sizes;
-		for (const auto& binding : layout.bindings)
-		{
-			VkDescriptorPoolSize size{};
-			size.type = binding.descriptorType;
-			size.descriptorCount = binding.descriptorCount;
-			sizes.push_back(size);
-		}
-		pool.pool = DescriptorPool(device, sizes);
-		pools.push_back(std::move(pool));
-	}
+	static constexpr u32 start_value = 4;
 
+	if (!freeSets.empty())
+	{
+		handle.set = std::move(freeSets.back());
+		freeSets.pop_back();
+		return handle;
+	}
+	if (pools.empty() || pools.back().left == 0)
+	{
+		Pool pool{};		
+		pool.pool = DescriptorPool(device, sizes, start_value, false);
+		pool.left = start_value - 1;
+		handle.set = DescriptorSet(device, pool.pool, layout.get());
+		pools.push_back(std::move(pool));
+		return handle;
+	}
+	Pool& pool = pools.back();
+	pool.left--;
+	handle.set = DescriptorSet(device, pool.pool, layout.get());
 	return handle;
 }
 
-void rv::DescriptorSetAllocator::Release(DescriptorSetHandle& handle)
+void rv::DescriptorPoolPool::Release(DescriptorSetHandle& handle)
 {
 	handle.allocator.invalidate();
-
+	freeSets.push_back(std::move(handle.set));
 }
 
-rv::DescriptorSetAllocator::Pool::Pool(Pool&& rhs) noexcept
+rv::DescriptorPoolPool::Pool::Pool(Pool&& rhs) noexcept
 	:
-	size(rhs.size),
-	filled(rhs.size),
+	left(rhs.left),
 	pool(std::move(rhs.pool))
 {
 }
 
-rv::DescriptorSetAllocator::Pool& rv::DescriptorSetAllocator::Pool::operator=(Pool&& rhs) noexcept
+rv::DescriptorPoolPool::Pool& rv::DescriptorPoolPool::Pool::operator=(Pool&& rhs) noexcept
 {
-	size = rhs.size;
-	filled = rhs.filled;
+	left = rhs.left;
 	pool = std::move(rhs.pool);
 	return *this;
+}
+
+rv::DescriptorSetHandle rv::DescriptorSetAllocator::CreateSet(Device& device, const DescriptorSetLayout& layout)
+{
+	auto it = pools.find(layout);
+	if (it == pools.end())
+	{
+		std::pair<DescriptorSetLayout, DescriptorPoolPool> pair{};
+		pair.first.Copy(layout);
+		pair.second = layout;
+		auto i = pools.insert(std::move(pair)).first;
+		return i->second.CreateSet(device);
+	}
+	return it->second.CreateSet(device);
 }
