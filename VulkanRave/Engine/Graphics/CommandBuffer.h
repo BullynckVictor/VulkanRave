@@ -6,6 +6,7 @@
 #include "Engine/Graphics/Sync.h"
 #include "Engine/Graphics/VertexBuffer.h"
 #include "Engine/Graphics/IndexBuffer.h"
+#include "Engine/Graphics/Image.h"
 #include "Engine/Graphics/DescriptorSet.h"
 #include "Engine/Utilities/Color.h"
 
@@ -37,6 +38,8 @@ namespace rv
 		void End();
 
 		void CopyBuffers(Buffer& source, Buffer& dest, u64 size);
+		void TransitionImageLayout(Image& image, VkImageLayout oldLayout, VkImageLayout newLayout, ShaderType firstUsed = RV_ST_FRAGMENT);
+		void CopyBufferToImage(Buffer& source, Image& image, const Size& size, VkImageLayout layout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
 		void Submit(
 			DeviceQueue& queue,

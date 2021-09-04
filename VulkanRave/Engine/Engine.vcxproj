@@ -201,6 +201,8 @@
     <ClInclude Include="Graphics\DescriptorSet.h" />
     <ClInclude Include="Graphics\Device.h" />
     <ClInclude Include="Graphics\Frame.h" />
+    <ClInclude Include="Graphics\Image.h" />
+    <ClInclude Include="Graphics\ImageBuffer.h" />
     <ClInclude Include="Graphics\ImageView.h" />
     <ClInclude Include="Graphics\IndexBuffer.h" />
     <ClInclude Include="Graphics\Instance.h" />
@@ -214,6 +216,7 @@
     <ClInclude Include="Graphics\Pipeline.h" />
     <ClInclude Include="Graphics\FrameBuffer.h" />
     <ClInclude Include="Graphics\Sync.h" />
+    <ClInclude Include="Graphics\Texture.h" />
     <ClInclude Include="Graphics\UniformBuffer.h" />
     <ClInclude Include="Graphics\Vertex.h" />
     <ClInclude Include="Graphics\VertexBuffer.h" />
@@ -503,6 +506,9 @@
     <ClInclude Include="Libraries\glm\vec3.hpp" />
     <ClInclude Include="Libraries\glm\vec4.hpp" />
     <ClInclude Include="Libraries\glm\vector_relational.hpp" />
+    <ClInclude Include="Libraries\stbi\LICENSE" />
+    <ClInclude Include="Libraries\stbi\stbi_image.h" />
+    <ClInclude Include="Libraries\stbi\stbi_image_write.h" />
     <ClInclude Include="Libraries\VulkanMemoryAllocator\vk_mem_alloc.h" />
     <ClInclude Include="Resources\BakedResource.h" />
     <ClInclude Include="Resources\triangle.frag.spv.h" />
@@ -539,6 +545,8 @@
     <ClCompile Include="General\source\Event.cpp" />
     <ClCompile Include="General\Window\source\WindowEvents.cpp" />
     <ClCompile Include="Graphics\source\DescriptorSet.cpp" />
+    <ClCompile Include="Graphics\source\Image.cpp" />
+    <ClCompile Include="Graphics\source\ImageBuffer.cpp" />
     <ClCompile Include="Graphics\source\OptimalBuffer.cpp" />
     <ClCompile Include="Graphics\source\ResourceAllocator.cpp" />
     <ClCompile Include="Graphics\source\Allocation.cpp" />
@@ -556,6 +564,7 @@
     <ClCompile Include="Graphics\source\Shader.cpp" />
     <ClCompile Include="Graphics\source\Swapchain.cpp" />
     <ClCompile Include="Graphics\source\Sync.cpp" />
+    <ClCompile Include="Graphics\source\Texture.cpp" />
     <ClCompile Include="Graphics\source\UniformBuffer.cpp" />
     <ClCompile Include="Graphics\source\VertexBuffer.cpp" />
     <ClCompile Include="Libraries\glm\detail\glm.cpp" />

@@ -1,6 +1,7 @@
 #include "Engine/Engine.h"
 #include "Engine/Resources/triangle.frag.spv.h"
 #include "Engine/Resources/triangle.vert.spv.h"
+#include <filesystem>
 
 class TestApp
 {
@@ -200,7 +201,8 @@ private:
 			transform(camera),
 			colorUniform(device, allocator, color),
 			transformUniform(device, allocator, transform.modelview),
-			color(rv::FColors::White)
+			color(rv::FColors::White),
+			image(device, allocator, "assets/cano.jpg")
 		{
 		}
 
@@ -214,6 +216,7 @@ private:
 		rv::VertexBufferT<rv::Vertex2> vertices;
 		rv::IndexBuffer16 indices;
 		rv::DescriptorSetHandle set = {};
+		rv::Texture image;
 	} triangle;
 };
 

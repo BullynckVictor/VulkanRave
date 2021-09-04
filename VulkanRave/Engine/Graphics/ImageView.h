@@ -18,21 +18,4 @@ namespace rv
 
 		VkImageView view = VK_NULL_HANDLE;
 	};
-
-	struct Image : public ImageView
-	{
-		Image() = default;
-		Image(Device & device, VkImage image, VkFormat format);
-		Image(const Image&) = delete;
-		Image(Image&& rhs) noexcept;
-		~Image();
-
-		Image& operator= (const Image&) = delete;
-		Image& operator= (Image && rhs) noexcept;
-
-		void Release();
-
-		VkFormat format{};
-		VkImage image = VK_NULL_HANDLE;
-	};
 }

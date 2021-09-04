@@ -74,7 +74,7 @@ namespace rv
 	template<typename T>
 	T __rv_not_null_func(const T& ret, const char* source, int line) { if (!ret) throw InfoException("Value was null", source, line); return ret; }
 	template<typename T>
-	T __rv_assert_not_null_func(const T& ret, const char* cond, const char* source, int line) { rv_assert_func(ret, cond, source, line); return ret; }
+	T __rv_assert_not_null_func(const T& ret, const char* cond, const char* source, int line) { __rv_assert_func(ret, cond, source, line); return ret; }
 	void __rv_assert_file_func(const char* file, const char* source, int line);
 }
 

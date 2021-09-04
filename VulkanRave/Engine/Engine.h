@@ -30,6 +30,8 @@
 #include "Engine/Graphics/IndexBuffer.h"
 #include "Engine/Graphics/UniformBuffer.h"
 #include "Engine/Graphics/ResourceAllocator.h"
+#include "Engine/Graphics/ImageBuffer.h"
+#include "Engine/Graphics/Texture.h"
 
 #include "Engine/Resources/BakedResource.h"
 

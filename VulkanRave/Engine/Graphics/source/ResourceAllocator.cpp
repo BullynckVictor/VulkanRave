@@ -4,15 +4,19 @@
 rv::ResourceAllocator::ResourceAllocator(Instance& instance, Device& device, const DeviceQueue& graphicsQueue)
 	:
 	allocator(instance, device),
-	pool(device, graphicsQueue)
+	pool(device, graphicsQueue),
+	graphics(graphicsQueue)
 {
 }
 
 rv::ResourceAllocator::ResourceAllocator(ResourceAllocator&& rhs) noexcept
 	:
 	allocator(std::move(rhs.allocator)),
-	pool(std::move(rhs.pool))
+	pool(std::move(rhs.pool)),
+	graphics(std::move(rhs.graphics))
 {
+	rhs.graphics.index = 0;
+	rhs.graphics.queue = VK_NULL_HANDLE;
 }
 
 rv::ResourceAllocator::~ResourceAllocator()
@@ -25,6 +29,9 @@ rv::ResourceAllocator& rv::ResourceAllocator::operator=(ResourceAllocator&& rhs)
 	Release();
 	allocator = std::move(rhs.allocator);
 	pool = std::move(rhs.pool);
+	graphics = std::move(rhs.graphics);
+	rhs.graphics.index = 0;
+	rhs.graphics.queue = VK_NULL_HANDLE;
 	return *this;
 }
 
@@ -36,17 +43,38 @@ void rv::ResourceAllocator::StageBuffer(Device& device, Buffer& dest, const void
 
 void rv::ResourceAllocator::CopyBuffers(Device& device, Buffer& source, Buffer& dest, u64 size)
 {
-	DeviceQueue graphicsQueue = device.GetQueue("graphics");
 	CommandBuffer command(device, pool);
 	command.Begin();
 	command.CopyBuffers(source, dest, size);
 	command.End();
-	command.Submit(graphicsQueue);
-	graphicsQueue.Wait();
+	command.Submit(graphics);
+	graphics.Wait();
+}
+
+void rv::ResourceAllocator::TransitionImageLayout(Device& device, Image& image, VkImageLayout oldLayout, VkImageLayout newLayout)
+{
+	CommandBuffer command(device, pool);
+	command.Begin();
+	command.TransitionImageLayout(image, oldLayout, newLayout);
+	command.End();
+	command.Submit(graphics);
+	graphics.Wait();
+}
+
+void rv::ResourceAllocator::CopyBufferToImage(Device& device, Buffer& source, Image& image, const Size& size, VkImageLayout layout)
+{
+	CommandBuffer command(device, pool);
+	command.Begin();
+	command.CopyBufferToImage(source, image, size, layout);
+	command.End();
+	command.Submit(graphics);
+	graphics.Wait();
 }
 
 void rv::ResourceAllocator::Release()
 {
 	allocator.Release();
 	pool.Release();
+	graphics.index = 0;
+	graphics.queue = VK_NULL_HANDLE;
 }
