@@ -15,7 +15,7 @@ public:
 		errorListener(messenger.Listen()),
 #endif
 		surface(window.Surface(instance)),
-		device(instance, rv::GraphicsRequirements(surface.get())),
+		device(instance, rv::GraphicsRequirements(surface.get()), rv::GraphicsOptionalFeatures()),
 		graphicsQueue(device.StoreQueue("graphics", { rv::QueueContainsFlag, VK_QUEUE_GRAPHICS_BIT })),
 		presentQueue(device.StoreQueue("present", { rv::QueueCanPresent, surface.get() })),
 		allocator(instance, device, graphicsQueue),
@@ -24,6 +24,8 @@ public:
 		pool(device, graphicsQueue),
 		frames(2),
 		camera(rv::Vector2{ 0 }, 0, 1, window.GetSize()),
+		linear(device, VK_FILTER_LINEAR),
+		pixel(device, VK_FILTER_NEAREST),
 		triangle(device, allocator, camera)
 	{
 		for (auto& frame : frames)
@@ -106,8 +108,9 @@ private:
 
 		frameBuffers.clear();
 		triangle.pipeline.Release();
-		triangle.layout.Release();
-		triangle.layout.Clear();
+		triangle.layout.ReleaseExceptSet();
+		triangle.layout.ClearExceptSet();
+		triangle.set.Release();
 		swap.Release();
 
 		swap = rv::SwapChain(device, surface.get(), rv::DefaultSwap(true), window.GetSize());
@@ -128,16 +131,19 @@ private:
 		pass.CreateSubpass();
 		pass.subpasses[0].AddColor(rv::attachments::Clear(swap.format.format));
 		pass.dependencies.push_back(rv::dependencies::Color(0));
-		triangle.layout.Release();
 		triangle.layout.pass = rv::RenderPass(device, pass);
 		triangle.layout.AddShader(frag);
 		triangle.layout.AddShader(vert);
 		triangle.layout.SetBlending(false);
 		triangle.layout.SetCulling(false);
 		triangle.layout.SetSize(window.GetSize());
-		triangle.layout.SetVertexType<rv::Vertex2>();
-		triangle.layout.descriptorSet.AddUniformBuffer(rv::RV_ST_VERTEX);
-		triangle.layout.descriptorSet.AddUniformBuffer(rv::RV_ST_FRAGMENT);
+		triangle.layout.SetVertexType<rv::TexVertex2>();
+		if (!triangle.layout.descriptorSet.layout)
+		{
+			triangle.layout.descriptorSet.AddUniformBuffer(rv::RV_ST_VERTEX);
+			triangle.layout.descriptorSet.AddImageSampler(rv::RV_ST_FRAGMENT);
+			triangle.layout.descriptorSet.AddUniformBuffer(rv::RV_ST_FRAGMENT);
+		}
 		triangle.layout.Finalize(device);
 		triangle.pipeline = rv::Pipeline(device, triangle.layout);
 
@@ -147,7 +153,8 @@ private:
 
 		triangle.set = setAllocator.CreateSet(device, triangle.layout.descriptorSet);
 		triangle.set.set.WriteBuffer(device, triangle.transformUniform, sizeof(rv::Matrix4), 0);
-		triangle.set.set.WriteBuffer(device, triangle.colorUniform, sizeof(rv::FColor), 1);
+		triangle.set.set.WriteImageSampler(device, triangle.image.view, linear, 1);
+		triangle.set.set.WriteBuffer(device, triangle.colorUniform, sizeof(rv::FColor), 2);
 
 		for (auto i : rv::range(triangle.commandBuffers))
 		{
@@ -185,17 +192,18 @@ private:
 	std::vector<VkFence> inFlight;
 	rv::Camera2 camera{};
 	rv::DescriptorSetAllocator setAllocator;
-	
+	rv::Sampler linear;
+	rv::Sampler pixel;	
 
 	struct Triangle
 	{
 		Triangle(rv::Device& device, rv::ResourceAllocator& allocator, const rv::Camera2& camera)
 			:
 			vertices(device, allocator, {
-				{{ -0.5f, -0.5f }},
-				{{  0.5f, -0.5f }},
-				{{  0.5f,  0.5f }},
-				{{ -0.5f,  0.5f }}
+				{{ -0.5f,  0.5f }, { 0.0f, 0.0f }},
+				{{  0.5f,  0.5f }, { 1.0f, 0.0f }},
+				{{  0.5f, -0.5f }, { 1.0f, 1.0f }},
+				{{ -0.5f, -0.5f }, { 0.0f, 1.0f }}
 			}),
 			indices(device, allocator, { 0, 1, 2, 2, 3, 0 }),
 			transform(camera),
@@ -213,10 +221,10 @@ private:
 		rv::FColor color;
 		rv::UniformBuffer colorUniform;
 		rv::UniformBuffer transformUniform;
-		rv::VertexBufferT<rv::Vertex2> vertices;
+		rv::VertexBufferT<rv::TexVertex2> vertices;
 		rv::IndexBuffer16 indices;
-		rv::DescriptorSetHandle set = {};
 		rv::Texture image;
+		rv::DescriptorSetHandle set = {};
 	} triangle;
 };
 

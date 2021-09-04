@@ -32,6 +32,7 @@ namespace rv
 	};
 
 	DeviceRequirements GraphicsRequirements(VkSurfaceKHR surface);
+	DeviceRequirements GraphicsOptionalFeatures();
 
 	struct DeviceQueue
 	{
@@ -46,7 +47,7 @@ namespace rv
 		PhysicalDevice(VkPhysicalDevice device);
 
 		bool Suitable(const DeviceRequirements& requirements) const;
-		uint32 Rate(const DeviceRequirements& requirements) const;
+		uint32 Rate(const DeviceRequirements& requirements, const DeviceRequirements& optional = {}) const;
 		OIndex QueueFamilyIndex(QueueChecker checker) const;
 
 		VkPhysicalDevice device = VK_NULL_HANDLE;
@@ -58,7 +59,7 @@ namespace rv
 	struct Device
 	{
 		Device() = default;
-		Device(Instance& instance, const DeviceRequirements& requirements = {});
+		Device(Instance& instance, const DeviceRequirements& requirements = {}, const DeviceRequirements& optional = {});
 		Device(const Device&) = delete;
 		Device(Device&& rhs) noexcept;
 		~Device() noexcept;

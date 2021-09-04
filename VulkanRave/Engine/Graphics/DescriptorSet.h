@@ -2,6 +2,8 @@
 #include "Engine/Graphics/Device.h"
 #include "Engine/Graphics/Shader.h"
 #include "Engine/Graphics/UniformBuffer.h"
+#include "Engine/Graphics/Sampler.h"
+#include "Engine/Graphics/ImageView.h"
 #include "Engine/Utilities/Reference.h"
 #include "Engine/Utilities/SortedVector.h"
 #include <list>
@@ -32,6 +34,7 @@ namespace rv
 
 		void AddBinding(VkDescriptorSetLayoutBinding binding);
 		void AddUniformBuffer(ShaderType shaderStages, u32 count = 1);
+		void AddImageSampler(ShaderType shaderStages, u32 count = 1);
 
 		std::vector<VkDescriptorSetLayoutBinding> bindings;
 		VkDescriptorSetLayout layout = VK_NULL_HANDLE;
@@ -66,6 +69,7 @@ namespace rv
 		DescriptorSet& operator= (DescriptorSet&& rhs) noexcept;
 
 		void WriteBuffer(Device& device, UniformBuffer& buffer, u64 size, u32 binding = 0, u32 arrayElement = 0);
+		void WriteImageSampler(Device& device, ImageView& view, Sampler& sampler, u32 binding = 0, u32 arrayElement = 0);
 
 		void Release();
 

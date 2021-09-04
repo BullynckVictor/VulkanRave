@@ -48,6 +48,8 @@ rv::Image::Image(
 		&memory.allocation,
 		nullptr
 	));
+
+	view = ImageView(device, image, format);
 }
 
 rv::Image::Image(Image&& rhs) noexcept

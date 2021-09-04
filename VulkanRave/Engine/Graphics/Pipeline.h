@@ -21,7 +21,9 @@ namespace rv
 		void Finalize(Device& device);
 
 		void Release();
+		void ReleaseExceptSet();
 		void Clear();
+		void ClearExceptSet();
 
 		void SetSize(const Size& size);
 		void SetTopology(const VkPrimitiveTopology& topology);

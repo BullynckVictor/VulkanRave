@@ -38,7 +38,7 @@ rv::DescriptorSetLayout& rv::DescriptorSetLayout::operator=(DescriptorSetLayout&
 int comp(const std::vector<VkDescriptorSetLayoutBinding>& a, const std::vector<VkDescriptorSetLayoutBinding>& b)
 {
 	for (const size_t i : rv::range(a))
-		if (int c = memcmp(&a[i], &b[i], sizeof(a)))
+		if (int c = memcmp(&a[i], &b[i], sizeof(VkDescriptorSetLayoutBinding)))
 			return c;
 	return 0;
 }
@@ -95,6 +95,16 @@ void rv::DescriptorSetLayout::AddUniformBuffer(ShaderType shaderStages, u32 coun
 	VkDescriptorSetLayoutBinding binding{};
 	binding.binding = (u32)bindings.size();
 	binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	binding.descriptorCount = count;
+	binding.stageFlags = (VkShaderStageFlags)shaderStages;
+	bindings.push_back(binding);
+}
+
+void rv::DescriptorSetLayout::AddImageSampler(ShaderType shaderStages, u32 count)
+{
+	VkDescriptorSetLayoutBinding binding{};
+	binding.binding = (u32)bindings.size();
+	binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 	binding.descriptorCount = count;
 	binding.stageFlags = (VkShaderStageFlags)shaderStages;
 	bindings.push_back(binding);
@@ -193,6 +203,25 @@ void rv::DescriptorSet::WriteBuffer(Device& device, UniformBuffer& buffer, u64 s
 	descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 	descriptorWrite.descriptorCount = 1;
 	descriptorWrite.pBufferInfo = &bufferInfo;
+
+	vkUpdateDescriptorSets(device.device, 1, &descriptorWrite, 0, nullptr);
+}
+
+void rv::DescriptorSet::WriteImageSampler(Device& device, ImageView& view, Sampler& sampler, u32 binding, u32 arrayElement)
+{
+	VkDescriptorImageInfo imageInfo{};
+	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	imageInfo.imageView = view.view;
+	imageInfo.sampler = sampler.sampler;
+
+	VkWriteDescriptorSet descriptorWrite{};
+	descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	descriptorWrite.dstSet = set;
+	descriptorWrite.dstBinding = binding;
+	descriptorWrite.dstArrayElement = arrayElement;
+	descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	descriptorWrite.descriptorCount = 1;
+	descriptorWrite.pImageInfo = &imageInfo;
 
 	vkUpdateDescriptorSets(device.device, 1, &descriptorWrite, 0, nullptr);
 }

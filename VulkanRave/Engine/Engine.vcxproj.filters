@@ -1080,6 +1080,9 @@
     <ClInclude Include="Graphics\Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\Sampler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Utilities\source\Exception.cpp">
@@ -1200,6 +1203,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\source\Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\source\Sampler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

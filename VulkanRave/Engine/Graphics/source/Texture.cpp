@@ -10,6 +10,7 @@ rv::Texture::Texture(Device& device, ResourceAllocator& allocator, ImageBuffer&&
 	Buffer stageBuffer(device, allocator.allocator, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU, (u64)buffer.GetLength() * sizeof(Color), buffer.data());
 	allocator.TransitionImageLayout(device, *this, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 	allocator.CopyBufferToImage(device, stageBuffer, *this, buffer.GetSize());
+	allocator.TransitionImageLayout(device, *this, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 rv::Texture::Texture(Texture&& rhs) noexcept

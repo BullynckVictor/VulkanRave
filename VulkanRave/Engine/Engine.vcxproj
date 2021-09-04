@@ -210,6 +210,7 @@
     <ClInclude Include="Graphics\OptimalBuffer.h" />
     <ClInclude Include="Graphics\RenderPass.h" />
     <ClInclude Include="Graphics\ResourceAllocator.h" />
+    <ClInclude Include="Graphics\Sampler.h" />
     <ClInclude Include="Graphics\Shader.h" />
     <ClInclude Include="Graphics\Command.h" />
     <ClInclude Include="Graphics\Swapchain.h" />
@@ -561,6 +562,7 @@
     <ClCompile Include="Graphics\source\ImageView.cpp" />
     <ClCompile Include="Graphics\source\Instance.cpp" />
     <ClCompile Include="Graphics\source\Pipeline.cpp" />
+    <ClCompile Include="Graphics\source\Sampler.cpp" />
     <ClCompile Include="Graphics\source\Shader.cpp" />
     <ClCompile Include="Graphics\source\Swapchain.cpp" />
     <ClCompile Include="Graphics\source\Sync.cpp" />

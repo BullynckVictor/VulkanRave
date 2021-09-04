@@ -1,13 +1,23 @@
-[13:47:14]	[DEBUG]    Created Instance "VulkanRave Application"
-[13:47:14]	[DEBUG]    Physical device "NVIDIA GeForce GTX 1660 Ti" chosen
-[13:47:15]	[INFO]     Created Device "NVIDIA GeForce GTX 1660 Ti"
-[13:47:15]	[DEBUG]    extent
+[15:49:05]	[DEBUG]    Created Instance "VulkanRave Application"
+[15:49:05]	[DEBUG]    Physical device "NVIDIA GeForce GTX 1660 Ti" chosen
+[15:49:06]	[INFO]     Created Device "NVIDIA GeForce GTX 1660 Ti"
+[15:49:06]	[DEBUG]    extent
 window:  (600, 400)
 current: (600, 400)
 min:     (600, 400)
 max:     (600, 400)
 
-[13:47:15]	[DEBUG]    Created Swapchain with 2 images
-[13:47:15]	[DEBUG]    Created Pipeline
-[13:47:15]	[DEBUG]    init time: 1.4227s
-[13:47:16]	[DEBUG]    81.7985 fps
+[15:49:06]	[DEBUG]    Created Swapchain with 2 images
+[15:49:06]	[DEBUG]    Created Pipeline
+[15:49:06]	[DEBUG]    init time: 1.44186s
+[15:49:08]	[DEBUG]    Window resize: (1920, 1001)
+[15:49:08]	[DEBUG]    Resize! (Present)
+[15:49:08]	[DEBUG]    extent
+window:  (1920, 1001)
+current: (1920, 1001)
+min:     (1920, 1001)
+max:     (1920, 1001)
+
+[15:49:08]	[DEBUG]    Created Swapchain with 2 images
+[15:49:08]	[DEBUG]    Created Pipeline
+[15:49:10]	[DEBUG]    102.287 fps

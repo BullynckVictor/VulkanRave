@@ -32,6 +32,7 @@
 #include "Engine/Graphics/ResourceAllocator.h"
 #include "Engine/Graphics/ImageBuffer.h"
 #include "Engine/Graphics/Texture.h"
+#include "Engine/Graphics/Sampler.h"
 
 #include "Engine/Resources/BakedResource.h"
 

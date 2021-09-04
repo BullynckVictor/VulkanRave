@@ -14,12 +14,12 @@ void rv::destroy<VkDevice>(VkDevice device) { vkDestroyDevice(device, nullptr); 
 
 rv::Device* rv::static_device = nullptr;
 
-rv::Device::Device(Instance& instance, const DeviceRequirements& requirements)
+rv::Device::Device(Instance& instance, const DeviceRequirements& requirements, const DeviceRequirements& optional)
 {
 	auto physicalDevices = PhysicalDevices(instance);
 	std::multimap<uint32, const PhysicalDevice*> candidates;
 	for (const auto& physical : physicalDevices)
-		candidates.insert(std::make_pair(physical.Rate(requirements), &physical));
+		candidates.insert(std::make_pair(physical.Rate(requirements, optional), &physical));
 	if (candidates.rbegin()->first > 0)
 		physicalDevice = *candidates.rbegin()->second;
 	else
@@ -30,6 +30,12 @@ rv::Device::Device(Instance& instance, const DeviceRequirements& requirements)
 	for (const auto& q : requirements.queues)
 	{
 		indices.insert(physicalDevice.QueueFamilyIndex(q));
+	}
+	for (const auto& q : optional.queues)
+	{
+		OIndex index = physicalDevice.QueueFamilyIndex(q);
+		if (index.valid())
+			indices.insert(index);
 	}
 	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 	for (auto index : indices)
@@ -43,16 +49,19 @@ rv::Device::Device(Instance& instance, const DeviceRequirements& requirements)
 		queueCreateInfos.push_back(queueCreateInfo);
 	}
 
+	std::vector<const char*> extensions = requirements.extensions;
+	extensions.insert(extensions.end(), optional.extensions.begin(), optional.extensions.end());
+
 	VkDeviceCreateInfo createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 	createInfo.pQueueCreateInfos = queueCreateInfos.data();
 	createInfo.queueCreateInfoCount = (u32)queueCreateInfos.size();
-	createInfo.pEnabledFeatures = &requirements.features;
+	createInfo.pEnabledFeatures = &physicalDevice.features;
 	createInfo.enabledExtensionCount = 0;
 	createInfo.ppEnabledLayerNames = instance.validation.data();
 	createInfo.enabledLayerCount = (u32)instance.validation.size();
-	createInfo.ppEnabledExtensionNames = requirements.extensions.data();
-	createInfo.enabledExtensionCount = (u32)requirements.extensions.size();
+	createInfo.ppEnabledExtensionNames = extensions.data();
+	createInfo.enabledExtensionCount = (u32)extensions.size();
 
 	rv_check_vkr(vkCreateDevice(physicalDevice.device, &createInfo, nullptr, &device));	
 	debug.Log(RV_MT_INFO, str("Created Device \"", physicalDevice.properties.deviceName, "\""));
@@ -164,7 +173,7 @@ bool rv::PhysicalDevice::Suitable(const DeviceRequirements& requirements) const
 	return true;
 }
 
-rv::uint32 rv::PhysicalDevice::Rate(const DeviceRequirements& requirements) const
+rv::uint32 rv::PhysicalDevice::Rate(const DeviceRequirements& requirements, const DeviceRequirements& optional) const
 {
 	uint32 rating = 0;
 	if (!Suitable(requirements))
@@ -172,6 +181,34 @@ rv::uint32 rv::PhysicalDevice::Rate(const DeviceRequirements& requirements) cons
 	if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
 		rating += 1000;
 	rating += properties.limits.maxImageDimension2D;
+
+	const VkBool32* bthis = reinterpret_cast<const VkBool32*>(&features);
+	const VkBool32* bopt = reinterpret_cast<const VkBool32*>(&optional.features);
+
+	for (u32 i = 0; i < sizeof(VkPhysicalDeviceFeatures) / sizeof(VkBool32); ++i)
+		if (bopt[i] && !bthis[i])
+			return rating += 10;
+
+	for (const auto& q : optional.queues)
+		if (QueueFamilyIndex(q).valid())
+			return rating += 10;
+
+	if (!optional.extensions.empty())
+	{
+		u32 extensionCount;
+		rv_check_vkr(vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr));
+
+		std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+		rv_check_vkr(vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data()));
+
+		std::set<std::string> optionalExtensions(optional.extensions.begin(), optional.extensions.end());
+
+		for (const auto& extension : availableExtensions)
+			optionalExtensions.erase(extension.extensionName);
+
+		rating += (u32)optionalExtensions.size() * 10;
+	}
+
 	return rating;
 }
 
@@ -246,6 +283,13 @@ rv::DeviceRequirements rv::GraphicsRequirements(VkSurfaceKHR surface)
 	requirements.extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 
 	return requirements;
+}
+
+rv::DeviceRequirements rv::GraphicsOptionalFeatures()
+{
+	rv::DeviceRequirements optional;
+	optional.features.samplerAnisotropy = VK_TRUE;
+	return optional;
 }
 
 bool rv::QueueChecker::operator==(const QueueChecker& rhs) const

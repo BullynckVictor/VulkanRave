@@ -71,7 +71,8 @@ rv::PipelineLayout& rv::PipelineLayout::operator=(PipelineLayout&& rhs) noexcept
 
 void rv::PipelineLayout::Finalize(Device& device)
 {
-	descriptorSet.Finalize(device);
+	if (!descriptorSet.layout)
+		descriptorSet.Finalize(device);
 
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -90,7 +91,19 @@ void rv::PipelineLayout::Release()
 	descriptorSet.Release();
 }
 
+void rv::PipelineLayout::ReleaseExceptSet()
+{
+	release(layout);
+	pass.Release();
+}
+
 void rv::PipelineLayout::Clear()
+{
+	ClearExceptSet();
+	descriptorSet.bindings.clear();
+}
+
+void rv::PipelineLayout::ClearExceptSet()
 {
 	vertexInput.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 	vertexInput.vertexBindingDescriptionCount = 0;
@@ -164,8 +177,6 @@ void rv::PipelineLayout::Clear()
 	colorBlending.blendConstants[3] = 0.0f; // Optional
 
 	dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-
-	descriptorSet.bindings.clear();
 }
 
 void rv::PipelineLayout::SetSize(const Size& size)
